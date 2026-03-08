@@ -450,6 +450,8 @@
     </div>
   </div>
 
+  <div id="programs"></div>
+
   <script>
     function showTab(tabId, btn) {
       document.querySelectorAll('.tab-section').forEach(section => {
@@ -497,4 +499,49 @@ const supabaseKey = "sb_publishable_ALIdTPrjJ2662wJYshbmxg_HlYlAqP6";
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 console.log("Supabase Connected");
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const supabaseUrl = "https://tbkvowcsfgzyuengkbdo.supabase.co"
+
+const supabaseKey = "sb_publishable_ALIdTPrjJ2662wJYshbmxg_HlYlAqP6"
+
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
+
+
+async function loadPrograms(){
+
+const { data, error } = await supabase
+.from("programs")
+.select("*")
+
+if(error){
+console.log(error)
+return
+}
+
+const container = document.getElementById("programs")
+
+data.forEach(program => {
+
+const div = document.createElement("div")
+
+div.innerHTML = `
+<h3>${program.program_name}</h3>
+<p>المجال: ${program.field}</p>
+<p>نسبة الإنجاز: ${program.progress}%</p>
+<hr>
+`
+
+container.appendChild(div)
+
+})
+
+}
+
+loadPrograms()
+
 </script>
