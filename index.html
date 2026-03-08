@@ -1,70 +1,467 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>منصة قيادة الأداء المدرسي</title>
-<style>
-body{
-font-family: Arial;
-direction: rtl;
-background:#f3f4f6;
-padding:40px
-}
-
-.container{
-max-width:900px;
-margin:auto
-}
-
-.card{
-background:white;
-padding:20px;
-border-radius:10px;
-margin-bottom:20px;
-box-shadow:0 2px 6px rgba(0,0,0,0.1)
-}
-
-h1{
-color:#1f2937
-}
-
-h3{
-color:#374151
-}
-
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>منصة قيادة الأداء المدرسي</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      color: #1f2937;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .header {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+    }
+    .header p {
+      margin: 6px 0;
+      color: #4b5563;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 24px;
+    }
+    .sidebar, .panel {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .sidebar {
+      padding: 16px;
+      height: fit-content;
+    }
+    .sidebar h3 {
+      margin: 8px 8px 14px;
+      font-size: 15px;
+      color: #6b7280;
+    }
+    .nav-btn {
+      width: 100%;
+      border: 0;
+      margin-bottom: 10px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #f8fafc;
+      color: #374151;
+      text-align: right;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .nav-btn.active {
+      background: #1f2937;
+      color: #fff;
+    }
+    .content {
+      display: grid;
+      gap: 24px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .card .label {
+      color: #6b7280;
+      font-size: 14px;
+    }
+    .card .value {
+      font-size: 30px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .panel {
+      padding: 24px;
+    }
+    .panel h2 {
+      margin-top: 0;
+      margin-bottom: 18px;
+      font-size: 24px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .mini-box {
+      border: 1px solid #e5e7eb;
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .progress-wrap { margin-bottom: 16px; }
+    .progress-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #374151;
+    }
+    .progress {
+      background: #e5e7eb;
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress > span {
+      display: block;
+      height: 100%;
+      background: #334155;
+      border-radius: 999px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: right;
+    }
+    th { color: #6b7280; }
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      font-weight: bold;
+      font-size: 13px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #374151;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 14px;
+      background: #fff;
+      font-size: 14px;
+    }
+    .save-btn {
+      margin-top: 18px;
+      border: 0;
+      background: #1f2937;
+      color: #fff;
+      padding: 14px 18px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .hidden { display: none; }
+    ul { margin: 0; padding-right: 18px; }
+    li { margin-bottom: 8px; }
+    @media (max-width: 900px) {
+      .layout, .grid-2, .cards, .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="container">
+    <div class="header">
+      <h1>منصة قيادة الأداء المدرسي</h1>
+      <p>النخيل الابتدائية بالقطيف – طفولة مبكرة والروضة الملحقة بها</p>
+      <p>لوحة متكاملة لمتابعة الخطة التشغيلية ومؤشرات الأداء والتوثيق المؤسسي.</p>
+    </div>
 
-<div class="container">
+    <div class="layout">
+      <div class="sidebar">
+        <h3>أقسام المنصة</h3>
+        <button class="nav-btn active" onclick="showTab('dashboard', this)">لوحة القيادة</button>
+        <button class="nav-btn" onclick="showTab('programs', this)">الخطة التشغيلية</button>
+        <button class="nav-btn" onclick="showTab('swot', this)">تحليل SWOT</button>
+        <button class="nav-btn" onclick="showTab('evidence', this)">الشواهد والتوثيق</button>
+        <button class="nav-btn" onclick="showTab('reports', this)">التقارير</button>
+      </div>
 
-<h1>منصة قيادة الأداء المدرسي</h1>
+      <div class="content">
+        <div id="dashboard" class="tab-section">
+          <div class="cards">
+            <div class="card"><div class="label">نسبة إنجاز الخطة</div><div class="value">76%</div></div>
+            <div class="card"><div class="label">البرامج المتقدمة</div><div class="value">3</div></div>
+            <div class="card"><div class="label">البرامج المتأخرة</div><div class="value">1</div></div>
+            <div class="card"><div class="label">إجمالي الشواهد</div><div class="value">26</div></div>
+            <div class="card"><div class="label">جاهزية الزيارة الإشرافية</div><div class="value">82%</div></div>
+          </div>
 
-<div class="card">
-<h3>نسبة إنجاز الخطة التشغيلية</h3>
-<p>78%</p>
-</div>
+          <div class="grid-2" style="margin-top:24px;">
+            <div class="panel">
+              <h2>مؤشرات المجالات</h2>
+              <div class="progress-wrap">
+                <div class="progress-head"><span>القيادة المدرسية</span><span>85%</span></div>
+                <div class="progress"><span style="width:85%"></span></div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-head"><span>التعليم والتعلم</span><span>72%</span></div>
+                <div class="progress"><span style="width:72%"></span></div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-head"><span>نواتج التعلم</span><span>67%</span></div>
+                <div class="progress"><span style="width:67%"></span></div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-head"><span>البيئة المدرسية</span><span>91%</span></div>
+                <div class="progress"><span style="width:91%"></span></div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-head"><span>الشراكة المجتمعية</span><span>64%</span></div>
+                <div class="progress"><span style="width:64%"></span></div>
+              </div>
+            </div>
 
-<div class="card">
-<h3>البرامج المنفذة</h3>
-<p>24 برنامج</p>
-</div>
+            <div class="panel">
+              <h2>قراءة إدارية سريعة</h2>
+              <div class="mini-box">أعلى مجال أداء حاليًا: البيئة المدرسية.</div>
+              <div class="mini-box">الأولوية القادمة: رفع جودة التوثيق ومتابعة برامج نواتج التعلم.</div>
+              <div class="mini-box">التوصية: الاستمرار في ربط كل برنامج بالمؤشر المرتبط والشاهد التنفيذي.</div>
+            </div>
+          </div>
+        </div>
 
-<div class="card">
-<h3>تحليل SWOT</h3>
-<p>
-نقاط القوة: استقرار الكادر – دعم الإدارة  
-<br>
-نقاط الضعف: تفاوت التوثيق  
-<br>
-الفرص: الشراكات المجتمعية  
-<br>
-التحديات: ضغط الأعمال
-</p>
-</div>
+        <div id="programs" class="tab-section hidden">
+          <div class="panel">
+            <h2>إضافة برنامج في الخطة التشغيلية</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>المجال</label>
+                <select>
+                  <option>القيادة المدرسية</option>
+                  <option>التعليم والتعلم</option>
+                  <option>نواتج التعلم</option>
+                  <option>البيئة المدرسية</option>
+                  <option>الشراكة المجتمعية</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>المؤشر المرتبط</label>
+                <input value="متابعة الأداء المدرسي" />
+              </div>
+              <div class="form-group">
+                <label>الهدف</label>
+                <input placeholder="اكتبي الهدف" />
+              </div>
+              <div class="form-group">
+                <label>اسم البرنامج</label>
+                <input placeholder="اكتبي اسم البرنامج" />
+              </div>
+              <div class="form-group">
+                <label>المسؤول عن التنفيذ</label>
+                <input placeholder="اكتبي اسم المسؤول" />
+              </div>
+              <div class="form-group">
+                <label>اللجنة/الفريق</label>
+                <input placeholder="اكتبي اسم اللجنة" />
+              </div>
+              <div class="form-group">
+                <label>تاريخ التنفيذ</label>
+                <input type="date" />
+              </div>
+              <div class="form-group">
+                <label>نسبة الإنجاز</label>
+                <input type="number" placeholder="0 - 100" />
+              </div>
+              <div class="form-group">
+                <label>الحالة</label>
+                <select>
+                  <option>قيد التنفيذ</option>
+                  <option>منجز جزئيًا</option>
+                  <option>منجز</option>
+                  <option>متأخر</option>
+                </select>
+              </div>
+            </div>
+            <button class="save-btn">حفظ البرنامج</button>
+          </div>
 
-</div>
+          <div class="panel" style="margin-top:24px;">
+            <h2>برامج الخطة التشغيلية</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>المجال</th>
+                  <th>المؤشر</th>
+                  <th>البرنامج</th>
+                  <th>المسؤول</th>
+                  <th>التاريخ</th>
+                  <th>الإنجاز</th>
+                  <th>الشواهد</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>القيادة المدرسية</td>
+                  <td>متابعة الأداء المدرسي</td>
+                  <td>برنامج التوثيق المؤسسي</td>
+                  <td>مديرة المدرسة</td>
+                  <td>2026-04-15</td>
+                  <td><span class="badge">85%</span></td>
+                  <td>6</td>
+                </tr>
+                <tr>
+                  <td>التعليم والتعلم</td>
+                  <td>جودة الممارسات التدريسية</td>
+                  <td>مبادرة الفهم القرائي</td>
+                  <td>لجنة التحصيل الدراسي</td>
+                  <td>2026-04-22</td>
+                  <td><span class="badge">72%</span></td>
+                  <td>4</td>
+                </tr>
+                <tr>
+                  <td>نواتج التعلم</td>
+                  <td>تحسن التحصيل</td>
+                  <td>خطة علاج الفاقد التعليمي</td>
+                  <td>فريق المواد الأساسية</td>
+                  <td>2026-05-05</td>
+                  <td><span class="badge">67%</span></td>
+                  <td>5</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
+        <div id="swot" class="tab-section hidden">
+          <div class="panel">
+            <h2>تحليل SWOT</h2>
+            <div class="grid-2">
+              <div class="mini-box">
+                <h3>نقاط القوة</h3>
+                <ul>
+                  <li>استقرار الكادر</li>
+                  <li>دعم الإدارة</li>
+                  <li>وجود مبادرات نوعية</li>
+                </ul>
+              </div>
+              <div class="mini-box">
+                <h3>نقاط الضعف</h3>
+                <ul>
+                  <li>تفاوت التوثيق</li>
+                  <li>ضغط الأعمال الموسمية</li>
+                  <li>تأخر تحديث بعض المؤشرات</li>
+                </ul>
+              </div>
+              <div class="mini-box">
+                <h3>الفرص</h3>
+                <ul>
+                  <li>الشراكات المجتمعية</li>
+                  <li>المنصات الرقمية</li>
+                  <li>برامج التطوير المهني</li>
+                </ul>
+              </div>
+              <div class="mini-box">
+                <h3>التحديات</h3>
+                <ul>
+                  <li>الغياب</li>
+                  <li>ضيق الوقت التنفيذي</li>
+                  <li>تفاوت التزام بعض الفرق</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="evidence" class="tab-section hidden">
+          <div class="panel">
+            <h2>الشواهد والتوثيق</h2>
+            <div class="grid-2">
+              <div class="mini-box">
+                <strong>تقرير تفعيل مبادرة الفهم القرائي</strong>
+                <div style="margin-top:8px;color:#4b5563;">النوع: تقرير</div>
+                <div style="margin-top:4px;color:#4b5563;">البرنامج المرتبط: مبادرة الفهم القرائي</div>
+              </div>
+              <div class="mini-box">
+                <strong>صور البيئة الجاذبة</strong>
+                <div style="margin-top:8px;color:#4b5563;">النوع: صور</div>
+                <div style="margin-top:4px;color:#4b5563;">البرنامج المرتبط: مبادرة البيئة الجاذبة</div>
+              </div>
+              <div class="mini-box">
+                <strong>محضر متابعة التوثيق المؤسسي</strong>
+                <div style="margin-top:8px;color:#4b5563;">النوع: محضر</div>
+                <div style="margin-top:4px;color:#4b5563;">البرنامج المرتبط: برنامج التوثيق المؤسسي</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="reports" class="tab-section hidden">
+          <div class="panel">
+            <h2>التقارير</h2>
+            <div class="cards" style="grid-template-columns:repeat(3,1fr);">
+              <div class="card">
+                <div class="label">تقرير الإنجاز العام</div>
+                <div class="value">76%</div>
+                <div style="margin-top:8px;color:#4b5563;font-size:14px;">متوسط التنفيذ لجميع البرامج.</div>
+              </div>
+              <div class="card">
+                <div class="label">عدد البرامج المتقدمة</div>
+                <div class="value">3</div>
+                <div style="margin-top:8px;color:#4b5563;font-size:14px;">البرامج التي تجاوزت 80٪.</div>
+              </div>
+              <div class="card">
+                <div class="label">مؤشر الجاهزية</div>
+                <div class="value">82%</div>
+                <div style="margin-top:8px;color:#4b5563;font-size:14px;">مؤشر جاهزية الزيارة الإشرافية.</div>
+              </div>
+            </div>
+            <div class="mini-box" style="margin-top:20px;">
+              التوصية العامة: الاستمرار في متابعة برامج نواتج التعلم، وتعزيز اكتمال الشواهد وربطها بالمؤشرات ذات الأولوية.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showTab(tabId, btn) {
+      document.querySelectorAll('.tab-section').forEach(section => {
+        section.classList.add('hidden');
+      });
+      document.getElementById(tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(button => {
+        button.classList.remove('active');
+      });
+      btn.classList.add('active');
+    }
+  </script>
 </body>
 </html>
