@@ -451,6 +451,42 @@
 
   <div id="programs"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const supabaseUrl = "https://tbkvowcsfgzyuengkbdo.supabase.co";
+const supabaseKey = "sb_publishable_ALIdTPrjJ2662wJYshbmxg_HlYlAqP6";
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+async function loadPrograms() {
+  const { data, error } = await supabaseClient
+    .from("programs")
+    .select("*");
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  const container = document.getElementById("programs");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  data.forEach(program => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${program.field || ""}</td>
+      <td>${program.indicator_name || ""}</td>
+      <td>${program.program_name || ""}</td>
+      <td>${program.owner_role || "مشترك"}</td>
+      <td>${program.start_date || ""}</td>
+    `;
+    container.appendChild(row);
+  });
+}
+
+loadPrograms();
+</script>
   <script>
     function showTab(tabId, btn) {
       document.querySelectorAll('.tab-section').forEach(section => {
