@@ -475,15 +475,17 @@ async function loadPrograms() {
   data.forEach(program => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${program.field || ""}</td>
-      <td>${program.indicator_name || ""}</td>
-      <td>${program.program_name || ""}</td>
-      <td>${program.owner_role || "مشترك"}</td>
-      <td>${program.start_date || ""}</td>
-    `;
-    container.appendChild(row);
-  });
-}
+<td>${program.field || ""}</td>
+<td>${program.indicator_name || ""}</td>
+<td>${program.program_name || ""}</td>
+<td>${program.owner_role || "مشترك"}</td>
+<td>${program.start_date || ""}</td>
+<td>
+<button onclick="addEvidence(${program.id}, '${program.program_name}')" style="background:#1f2937;color:#fff;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;">
+رفع شاهد
+</button>
+</td>
+`;
 
 loadPrograms();
 </script>
