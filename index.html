@@ -653,11 +653,12 @@ data.forEach(program => {
       await refreshAll();
     });
 
-    async function refreshAll() {
-      await loadEvidenceCounts();
-      await loadPrograms();
-      await loadSwot();
-    }
+   async function refreshAll() {
+  await loadEvidenceCounts();
+  await loadPrograms();
+  await loadSwot();
+  await loadUsers();
+}
 
     window.onclick = function(event) {
       const modal = document.getElementById("evidenceModal");
@@ -686,6 +687,80 @@ data.forEach(program => {
   alert("تم إرسال طلب التسجيل بنجاح، وبانتظار اعتماد الإدارة");
   document.getElementById("registerForm").reset();
 });
+    async function loadUsers() {
+  const { data, error } = await supabaseClient
+    .from("users")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  const container = document.getElementById("usersList");
+  if (!container) return;
+
+  if (error) {
+    console.log(error);
+    container.innerHTML = '<div class="empty">تعذر تحميل المستخدمين</div>';
+    return;
+  }
+
+  if (!data.length) {
+    container.innerHTML = '<div class="empty">لا توجد طلبات تسجيل بعد</div>';
+    return;
+  }
+
+  container.innerHTML = "";
+
+  data.forEach(user => {
+    const card = document.createElement("div");
+    card.className = "program-card";
+
+    let statusText = "بانتظار الموافقة";
+    if (user.status === "active") statusText = "نشط";
+    if (user.status === "blocked") statusText = "موقوف";
+
+    card.innerHTML = `
+      <h3>${user.full_name}</h3>
+      <div class="program-meta">
+        <div><strong>البريد:</strong> ${user.email}</div>
+        <div><strong>الدور:</strong> ${user.role}</div>
+        <div><strong>الحالة:</strong> ${statusText}</div>
+      </div>
+
+      <div class="program-actions">
+        <div class="small-badges">
+          <span class="badge">${user.role}</span>
+          <span class="badge">${user.status}</span>
+        </div>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn-primary btn-small" onclick='updateUserStatus("${user.id}", "active")'>
+            قبول
+          </button>
+          <button class="btn-secondary btn-small" onclick='updateUserStatus("${user.id}", "blocked")'>
+            إيقاف
+          </button>
+        </div>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+async function updateUserStatus(userId, newStatus) {
+  const { error } = await supabaseClient
+    .from("users")
+    .update({ status: newStatus })
+    .eq("id", userId);
+
+  if (error) {
+    alert("حدث خطأ أثناء تحديث حالة المستخدم");
+    console.log(error);
+    return;
+  }
+
+  alert("تم تحديث حالة المستخدم بنجاح");
+  await loadUsers();
+}
     refreshAll();
   </script>
 </body>
