@@ -12,6 +12,90 @@
       background: #f3f4f6;
       color: #1f2937;
     }
+
+    .program-cards {
+  display: grid;
+  gap: 14px;
+}
+
+.program-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.program-card h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  line-height: 1.6;
+}
+
+.program-meta {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.program-meta div {
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.program-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.small-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.metric {
+  font-size: 32px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 14px;
+  }
+
+  .hero {
+    padding: 20px;
+  }
+
+  .hero h1 {
+    font-size: 28px;
+    line-height: 1.6;
+  }
+
+  .section h2 {
+    font-size: 26px;
+    line-height: 1.5;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .roles-box {
+    font-size: 14px;
+  }
+
+  .btn-primary, .btn-secondary {
+    width: 100%;
+  }
+
+  .modal-content {
+    margin: 20px auto;
+    padding: 18px;
+  }
+}
     .container {
       max-width: 1200px;
       margin: auto;
@@ -268,25 +352,10 @@
       </form>
     </section>
 
-    <section class="section">
-      <h2>برامج الخطة التشغيلية</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>المجال</th>
-            <th>المؤشر</th>
-            <th>البرنامج</th>
-            <th>المسؤول</th>
-            <th>التاريخ</th>
-            <th>الإنجاز</th>
-            <th>الحالة</th>
-            <th>الشواهد</th>
-            <th>إجراء</th>
-          </tr>
-        </thead>
-        <tbody id="programs"></tbody>
-      </table>
-    </section>
+<section class="section">
+  <h2>برامج الخطة التشغيلية</h2>
+  <div id="programs" class="program-cards"></div>
+</section>
 
     <section class="section">
       <h2>تحليل SWOT</h2>
@@ -383,15 +452,57 @@
     }
 
     async function loadPrograms() {
-      const { data, error } = await supabaseClient
-        .from("programs")
-        .select("*")
-        .order("id", { ascending: true });
+  const { data, error } = await supabaseClient
+    .from("programs")
+    .select("*")
+    .order("id", { ascending: true });
 
-      if (error) {
-        console.log(error);
-        return;
-      }
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  const container = document.getElementById("programs");
+  container.innerHTML = "";
+
+  let totalProgress = 0;
+
+  data.forEach(program => {
+    totalProgress += Number(program.progress || 0);
+
+    const card = document.createElement("div");
+    card.className = "program-card";
+
+    card.innerHTML = `
+      <h3>${program.program_name || ""}</h3>
+
+      <div class="program-meta">
+        <div><strong>المجال:</strong> ${program.field || ""}</div>
+        <div><strong>المؤشر:</strong> ${program.indicator_name || "غير محدد"}</div>
+        <div><strong>المسؤول:</strong> ${program.owner_role || "مشترك"}</div>
+        <div><strong>تاريخ التنفيذ:</strong> ${program.start_date || "غير محدد"}</div>
+      </div>
+
+      <div class="program-actions">
+        <div class="small-badges">
+          <span class="badge">${program.progress || 0}% إنجاز</span>
+          <span class="${statusClass(program.status)}">${program.status || "قيد التنفيذ"}</span>
+          <span class="badge">الشواهد: ${evidenceCounts[program.id] || 0}</span>
+        </div>
+
+        <button class="btn-primary btn-small" onclick='openEvidenceModal(${program.id}, ${JSON.stringify(program.program_name || "")})'>
+          رفع شاهد
+        </button>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+
+  document.getElementById("metricPrograms").textContent = data.length;
+  document.getElementById("metricProgress").textContent =
+    data.length ? Math.round(totalProgress / data.length) + "%" : "0%";
+}
 
       const container = document.getElementById("programs");
       container.innerHTML = "";
