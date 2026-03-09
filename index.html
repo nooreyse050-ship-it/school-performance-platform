@@ -417,7 +417,7 @@
       </div>
     </div>
   </div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const supabaseUrl = "https://ivspdtyzwacdfjrnrsyh.supabase.co";
@@ -704,8 +704,8 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
       if (event.target === modal) closeEvidenceModal();
     };
 
-    refreshAll();
+    console.log("SCRIPT RUNNING");
+refreshAll();
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </body>
 </html>
