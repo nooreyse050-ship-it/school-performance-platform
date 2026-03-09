@@ -255,7 +255,24 @@
         <div class="metric">42</div>
       </div>
     </section>
+<section class="section">
+  <h2>تسجيل مستخدم جديد</h2>
+  <form id="registerForm">
+    <label>الاسم الكامل</label>
+    <input id="register_name" type="text" placeholder="اكتبي الاسم الكامل" required />
 
+    <label>البريد الإلكتروني</label>
+    <input id="register_email" type="email" placeholder="example@email.com" required />
+
+    <label>الدور</label>
+    <select id="register_role" required>
+      <option value="معلمة">معلمة</option>
+      <option value="مساعد إداري">مساعد إداري</option>
+    </select>
+
+    <button class="btn-primary" type="submit">إرسال طلب التسجيل</button>
+  </form>
+</section>
     <section class="section">
       <h2>إضافة برنامج في الخطة التشغيلية</h2>
       <form id="programForm">
@@ -640,7 +657,29 @@ data.forEach(program => {
       const modal = document.getElementById("evidenceModal");
       if (event.target === modal) closeEvidenceModal();
     };
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
+  const payload = {
+    full_name: document.getElementById("register_name").value,
+    email: document.getElementById("register_email").value,
+    role: document.getElementById("register_role").value,
+    status: "pending"
+  };
+
+  const { error } = await supabaseClient
+    .from("users")
+    .insert([payload]);
+
+  if (error) {
+    alert("حدث خطأ أثناء إرسال طلب التسجيل");
+    console.log(error);
+    return;
+  }
+
+  alert("تم إرسال طلب التسجيل بنجاح، وبانتظار اعتماد الإدارة");
+  document.getElementById("registerForm").reset();
+});
     refreshAll();
   </script>
 </body>
