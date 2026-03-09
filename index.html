@@ -477,16 +477,16 @@ async function loadPrograms() {
   data.forEach(program => {
     const row = document.createElement("tr");
     row.innerHTML = `
-<td>${program.field || ""}</td>
-<td>${program.indicator_name || ""}</td>
-<td>${program.program_name || ""}</td>
-<td>${program.owner_role || "مشترك"}</td>
-<td>${program.start_date || ""}</td>
-<td>
-<button onclick="addEvidence(${program.id}, '${program.program_name}')" style="background:#1f2937;color:#fff;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;">
-رفع شاهد
-</button>
-</td>
+  <td>${program.field || ""}</td>
+  <td>${program.indicator_name || ""}</td>
+  <td>${program.program_name || ""}</td>
+  <td>${program.owner_role || "مشترك"}</td>
+  <td>${program.start_date || ""}</td>
+  <td>
+    <button onclick="addEvidence(${program.id}, '${program.program_name}')" style="background:#1f2937;color:#fff;border:none;padding:8px 12px;border-radius:10px;cursor:pointer;">
+      رفع شاهد
+    </button>
+  </td>
 `;
 
 loadPrograms();
@@ -583,6 +583,37 @@ container.appendChild(div)
 loadPrograms()
 
 </script>
-  
+  <script>
+async function addEvidence(programId, programName) {
+  const teacherName = prompt("أدخلي اسم المعلمة / المنسوبة:");
+  if (!teacherName) return;
+
+  const title = prompt("أدخلي عنوان الشاهد للبرنامج: " + programName);
+  if (!title) return;
+
+  const fileUrl = prompt("أدخلي رابط الشاهد أو اسم الملف:");
+  if (!fileUrl) return;
+
+  const { error } = await supabaseClient
+    .from("evidence")
+    .insert([
+      {
+        program_id: programId,
+        title: title,
+        file_url: fileUrl,
+        note: teacherName,
+        evidence_type: "رابط"
+      }
+    ]);
+
+  if (error) {
+    alert("حدث خطأ أثناء حفظ الشاهد");
+    console.log(error);
+    return;
+  }
+
+  alert("تم حفظ الشاهد بنجاح");
+}
+  </script>
 </body>
 </html>
