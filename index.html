@@ -397,8 +397,7 @@ const supabaseKey = "sb_publishable_i0vQ90zclZwHaSFCzHOOfw_Gsfkld9f";
       const { data, error } = await supabaseClient
         .from("programs")
         .select("*")
-        .order("created_at", { ascending: true });
-
+        .order("field", { ascending: true });
       if (error) {
         console.log("programs error", error);
         document.getElementById("programs").innerHTML = '<div class="empty">تعذر تحميل البرامج</div>';
