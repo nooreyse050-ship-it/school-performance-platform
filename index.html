@@ -6,368 +6,222 @@
   <title>منصة قيادة الأداء المدرسي</title>
   <style>
     * { box-sizing: border-box; }
-
-    :root{
-      --bg:#f3f4f6;
-      --card:#ffffff;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --border:#e5e7eb;
-      --primary:#1f2937;
-      --soft:#eef2ff;
-      --success-bg:#dcfce7;
-      --success-text:#166534;
-      --warn-bg:#fef3c7;
-      --warn-text:#92400e;
-      --danger-bg:#fee2e2;
-      --danger-text:#991b1b;
-      --shadow:0 8px 24px rgba(0,0,0,.07);
-      --radius:22px;
-    }
-
-    body{
-      margin:0;
+    body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      line-height:1.7;
+      background: #f3f4f6;
+      color: #1f2937;
     }
-
-    .container{
-      max-width:1200px;
-      margin:auto;
-      padding:16px;
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 16px;
     }
-
-    .hero,
-    .section,
-    .metric-card,
-    .modal-content{
-      background:var(--card);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
+    .card, .hero, .section, .modal-content {
+      background: #fff;
+      border-radius: 22px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
     }
-
-    .hero{
-      padding:26px 20px;
-      text-align:center;
-      margin-bottom:18px;
+    .hero {
+      padding: 24px;
+      margin-bottom: 16px;
+      text-align: center;
     }
-
-    .hero h1{
-      margin:0 0 12px;
-      font-size:clamp(30px, 5vw, 48px);
-      line-height:1.4;
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 32px;
+      line-height: 1.6;
     }
-
-    .hero p{
-      margin:8px 0;
-      color:var(--muted);
-      font-size:clamp(15px, 2.1vw, 20px);
+    .hero p {
+      margin: 8px 0;
+      color: #4b5563;
+      line-height: 1.8;
     }
-
-    .roles-box{
-      margin-top:18px;
-      padding:16px;
-      background:var(--soft);
-      border-radius:18px;
-      color:#1e3a8a;
-      font-size:clamp(14px,2vw,18px);
+    .roles-box {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 16px;
+      background: #eef2ff;
+      color: #1e3a8a;
+      line-height: 1.9;
     }
-
-    .metrics{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:14px;
-      margin-bottom:18px;
+    .grid {
+      display: grid;
+      gap: 14px;
     }
-
-    .metric-card{
-      padding:18px;
-      min-height:130px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
+    .grid-4 {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     }
-
-    .metric-title{
-      color:var(--muted);
-      font-size:18px;
-      font-weight:bold;
+    .stat-card {
+      padding: 18px;
     }
-
-    .metric-value{
-      font-size:54px;
-      font-weight:800;
-      line-height:1;
-      text-align:left;
-      direction:ltr;
+    .stat-card h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      color: #6b7280;
     }
-
-    .section{
-      padding:22px;
-      margin-bottom:18px;
+    .metric {
+      font-size: 32px;
+      font-weight: bold;
     }
-
-    .section h2{
-      margin:0 0 18px;
-      font-size:clamp(28px,4vw,40px);
-      line-height:1.4;
+    .section {
+      padding: 22px;
+      margin-top: 18px;
     }
-
-    .form-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:14px;
+    .section h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 30px;
+      line-height: 1.5;
     }
-
-    .full{
-      grid-column:1 / -1;
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
     }
-
-    label{
-      display:block;
-      margin-bottom:8px;
-      font-weight:bold;
-      font-size:15px;
+    input, select, textarea {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 14px;
+      font-size: 15px;
+      margin-bottom: 14px;
+      background: #fff;
     }
-
-    input, select, textarea{
-      width:100%;
-      padding:14px 16px;
-      border:1px solid var(--border);
-      border-radius:16px;
-      font-size:15px;
-      background:#fff;
-      color:var(--text);
-      outline:none;
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-size: 15px;
     }
-
-    input:focus, select:focus, textarea:focus{
-      border-color:#c7d2fe;
-      box-shadow:0 0 0 3px rgba(99,102,241,.08);
+    .btn-primary {
+      background: #1f2937;
+      color: #fff;
     }
-
-    button{
-      border:none;
-      border-radius:16px;
-      padding:13px 18px;
-      cursor:pointer;
-      font-size:15px;
-      font-weight:bold;
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
     }
-
-    .btn-primary{
-      background:var(--primary);
-      color:#fff;
+    .btn-small {
+      padding: 8px 12px;
+      font-size: 13px;
+      border-radius: 10px;
     }
-
-    .btn-secondary{
-      background:#e5e7eb;
-      color:#111827;
+    .program-cards {
+      display: grid;
+      gap: 14px;
     }
-
-    .btn-small{
-      padding:9px 12px;
-      border-radius:12px;
-      font-size:13px;
+    .program-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 16px;
     }
-
-    .program-list{
-      display:grid;
-      gap:14px;
+    .program-card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      line-height: 1.6;
     }
-
-    .program-card{
-      border:1px solid var(--border);
-      border-radius:18px;
-      padding:16px;
-      background:#fff;
+    .program-meta {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 12px;
     }
-
-    .program-card h3{
-      margin:0 0 10px;
-      font-size:24px;
-      line-height:1.5;
+    .program-meta div {
+      font-size: 14px;
+      line-height: 1.8;
     }
-
-    .program-meta{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:8px 16px;
-      margin-bottom:14px;
-      font-size:15px;
+    .program-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
     }
-
-    .program-meta strong{
-      color:#374151;
+    .small-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-
-    .program-footer{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #1e3a8a;
+      font-weight: bold;
+      font-size: 13px;
     }
-
-    .badge-row{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
+    .status {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
     }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      padding:7px 11px;
-      border-radius:999px;
-      background:#eef2ff;
-      color:#1e3a8a;
-      font-size:13px;
-      font-weight:bold;
+    .status-running { background: #fef3c7; color: #92400e; }
+    .status-done { background: #dcfce7; color: #166534; }
+    .status-late { background: #fee2e2; color: #991b1b; }
+    .muted {
+      color: #6b7280;
     }
-
-    .status{
-      display:inline-flex;
-      align-items:center;
-      padding:7px 11px;
-      border-radius:999px;
-      font-size:13px;
-      font-weight:bold;
+    .swot-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     }
-
-    .status-running{ background:var(--warn-bg); color:var(--warn-text); }
-    .status-done{ background:var(--success-bg); color:var(--success-text); }
-    .status-late{ background:var(--danger-bg); color:var(--danger-text); }
-
-    .swot-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:14px;
+    .swot-box {
+      border-radius: 18px;
+      padding: 16px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
     }
-
-    .swot-box{
-      border:1px solid var(--border);
-      border-radius:18px;
-      padding:16px;
-      background:#fff;
-      min-height:190px;
+    .swot-box h3 {
+      margin-top: 0;
     }
-
-    .swot-box h3{
-      margin:0 0 12px;
-      font-size:28px;
+    .empty {
+      padding: 18px;
+      text-align: center;
+      color: #6b7280;
+      background: #f9fafb;
+      border-radius: 16px;
+      margin-top: 12px;
     }
-
-    .swot-box .content{
-      color:var(--muted);
-      font-size:16px;
-      line-height:2;
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 999;
+      padding: 16px;
+      overflow-y: auto;
     }
-
-    .empty{
-      padding:18px;
-      border:1px dashed var(--border);
-      border-radius:16px;
-      color:var(--muted);
-      text-align:center;
-      background:#fafafa;
+    .modal-content {
+      max-width: 620px;
+      margin: 40px auto;
+      padding: 24px;
     }
-
-    .notice{
-      margin-top:12px;
-      padding:12px 14px;
-      border-radius:14px;
-      background:#fff7ed;
-      color:#9a3412;
-      font-size:14px;
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
     }
-
-    .modal{
-      display:none;
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.45);
-      z-index:9999;
-      overflow:auto;
-      padding:16px;
+    .modal-header h3 {
+      margin: 0;
     }
-
-    .modal-content{
-      max-width:760px;
-      margin:30px auto;
-      padding:22px;
+    .evidence-list a {
+      word-break: break-word;
     }
-
-    .modal-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-bottom:12px;
-    }
-
-    .modal-head h3{
-      margin:0;
-      font-size:28px;
-      line-height:1.4;
-    }
-
-    .evidence-list{
-      margin-top:16px;
-      display:grid;
-      gap:12px;
-    }
-
-    .evidence-item{
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:14px;
-      background:#fff;
-    }
-
-    .evidence-item strong{
-      display:block;
-      margin-bottom:6px;
-      font-size:17px;
-    }
-
-    .evidence-item .meta{
-      color:var(--muted);
-      margin-bottom:8px;
-      font-size:14px;
-    }
-
-    .evidence-item a{
-      color:#1d4ed8;
-      word-break:break-word;
-    }
-
-    .loading{
-      color:var(--muted);
-      font-size:15px;
-    }
-
-    @media (max-width: 980px){
-      .metrics{ grid-template-columns:repeat(2,1fr); }
-      .form-grid{ grid-template-columns:1fr; }
-      .program-meta{ grid-template-columns:1fr; }
-      .swot-grid{ grid-template-columns:1fr; }
-    }
-
-    @media (max-width: 640px){
-      .container{ padding:12px; }
-      .hero{ padding:22px 16px; }
-      .section{ padding:18px; }
-      .metric-card{ min-height:120px; }
-      .metric-title{ font-size:16px; }
-      .metric-value{ font-size:44px; }
-      .program-card h3{ font-size:21px; }
-      .swot-box h3{ font-size:24px; }
-      .modal-content{ padding:18px; margin:18px auto; }
-      .modal-head h3{ font-size:23px; }
-      .btn-primary, .btn-secondary{ width:100%; }
+    @media (max-width: 768px) {
+      .container { padding: 14px; }
+      .hero { padding: 20px; }
+      .hero h1 { font-size: 28px; }
+      .section h2 { font-size: 26px; }
+      .modal-content { margin: 20px auto; padding: 18px; }
+      .btn-primary, .btn-secondary { width: 100%; }
     }
   </style>
 </head>
@@ -377,92 +231,71 @@
       <h1>منصة قيادة الأداء المدرسي</h1>
       <p>النخيل الابتدائية بالقطيف – طفولة مبكرة والروضة الملحقة بها</p>
       <p>لوحة متكاملة لمتابعة الخطة التشغيلية ومؤشرات الأداء والتوثيق المؤسسي</p>
-
       <div class="roles-box">
         <strong>تصنيفات الاستخدام داخل المنصة:</strong><br>
         مديرة المدرسة – وكيلة – موجه طلابي – إدارية – معلمة
       </div>
     </section>
 
-    <section class="metrics">
-      <div class="metric-card">
-        <div class="metric-title">إجمالي البرامج</div>
-        <div class="metric-value" id="metricPrograms">0</div>
+    <section class="grid grid-4">
+      <div class="card stat-card">
+        <h3>إجمالي البرامج</h3>
+        <div class="metric" id="metricPrograms">0</div>
       </div>
-      <div class="metric-card">
-        <div class="metric-title">إجمالي الشواهد</div>
-        <div class="metric-value" id="metricEvidence">0</div>
+      <div class="card stat-card">
+        <h3>إجمالي الشواهد</h3>
+        <div class="metric" id="metricEvidence">0</div>
       </div>
-      <div class="metric-card">
-        <div class="metric-title">متوسط الإنجاز</div>
-        <div class="metric-value" id="metricProgress">0%</div>
+      <div class="card stat-card">
+        <h3>متوسط الإنجاز</h3>
+        <div class="metric" id="metricProgress">0%</div>
       </div>
-      <div class="metric-card">
-        <div class="metric-title">عدد المستخدمين المستهدف</div>
-        <div class="metric-value">42</div>
+      <div class="card stat-card">
+        <h3>عدد المستخدمين المستهدف</h3>
+        <div class="metric">42</div>
       </div>
     </section>
 
     <section class="section">
       <h2>إضافة برنامج في الخطة التشغيلية</h2>
-
       <form id="programForm">
-        <div class="form-grid">
-          <div>
-            <label for="field">المجال</label>
-            <select id="field" required>
-              <option value="القيادة والإدارة المدرسية">القيادة والإدارة المدرسية</option>
-              <option value="التعليم والتعلم">التعليم والتعلم</option>
-              <option value="البيئة المدرسية">البيئة المدرسية</option>
-              <option value="نواتج التعلم">نواتج التعلم</option>
-            </select>
-          </div>
+        <label>المجال</label>
+        <select id="field" required>
+          <option value="القيادة والإدارة المدرسية">القيادة والإدارة المدرسية</option>
+          <option value="التعليم والتعلم">التعليم والتعلم</option>
+          <option value="البيئة المدرسية">البيئة المدرسية</option>
+          <option value="نواتج التعلم">نواتج التعلم</option>
+        </select>
 
-          <div>
-            <label for="indicator_name">المؤشر المرتبط</label>
-            <input id="indicator_name" type="text" placeholder="اكتبي المؤشر" required />
-          </div>
+        <label>المؤشر المرتبط</label>
+        <input id="indicator_name" type="text" placeholder="اكتبي المؤشر" />
 
-          <div class="full">
-            <label for="program_name">اسم البرنامج</label>
-            <input id="program_name" type="text" placeholder="اكتبي اسم البرنامج" required />
-          </div>
+        <label>اسم البرنامج</label>
+        <input id="program_name" type="text" placeholder="اكتبي اسم البرنامج" required />
 
-          <div>
-            <label for="owner_role">المسؤول عن التنفيذ</label>
-            <input id="owner_role" type="text" value="مشترك" />
-          </div>
+        <label>المسؤول</label>
+        <input id="owner_role" type="text" value="مشترك" />
 
-          <div>
-            <label for="progress">نسبة الإنجاز</label>
-            <input id="progress" type="number" min="0" max="100" value="0" />
-          </div>
+        <label>تاريخ التنفيذ</label>
+        <input id="start_date" type="date" />
 
-          <div>
-            <label for="status">الحالة</label>
-            <select id="status">
-              <option value="قيد التنفيذ">قيد التنفيذ</option>
-              <option value="منجز">منجز</option>
-              <option value="متأخر">متأخر</option>
-            </select>
-          </div>
+        <label>نسبة الإنجاز</label>
+        <input id="progress" type="number" min="0" max="100" value="0" />
 
-          <div class="full">
-            <button class="btn-primary" type="submit">حفظ البرنامج</button>
-          </div>
-        </div>
+        <label>الحالة</label>
+        <select id="status">
+          <option value="قيد التنفيذ">قيد التنفيذ</option>
+          <option value="منجز">منجز</option>
+          <option value="متأخر">متأخر</option>
+        </select>
+
+        <button class="btn-primary" type="submit">حفظ البرنامج</button>
       </form>
-
-      <div class="notice">
-        إذا لم يظهر البرنامج مباشرة بعد الحفظ، حدّثي الصفحة مرة واحدة.
-      </div>
     </section>
 
     <section class="section">
       <h2>برامج الخطة التشغيلية</h2>
-      <div id="programs" class="program-list">
-        <div class="loading">جاري التحميل...</div>
-      </div>
+      <div id="programs" class="program-cards"></div>
     </section>
 
     <section class="section">
@@ -470,19 +303,19 @@
       <div class="swot-grid">
         <div class="swot-box">
           <h3>نقاط القوة</h3>
-          <div id="swot-strength" class="content">جاري التحميل...</div>
+          <div id="swot-strength" class="muted">جاري التحميل...</div>
         </div>
         <div class="swot-box">
           <h3>نقاط الضعف</h3>
-          <div id="swot-weakness" class="content">جاري التحميل...</div>
+          <div id="swot-weakness" class="muted">جاري التحميل...</div>
         </div>
         <div class="swot-box">
           <h3>الفرص</h3>
-          <div id="swot-opportunity" class="content">جاري التحميل...</div>
+          <div id="swot-opportunity" class="muted">جاري التحميل...</div>
         </div>
         <div class="swot-box">
           <h3>التحديات</h3>
-          <div id="swot-threat" class="content">جاري التحميل...</div>
+          <div id="swot-threat" class="muted">جاري التحميل...</div>
         </div>
       </div>
     </section>
@@ -490,38 +323,37 @@
 
   <div class="modal" id="evidenceModal">
     <div class="modal-content">
-      <div class="modal-head">
-        <h3 id="modalTitle">رفع شاهد</h3>
-        <button type="button" class="btn-secondary" onclick="closeEvidenceModal()">إغلاق</button>
+      <div class="modal-header">
+        <h3 id="evidenceModalTitle">رفع شاهد</h3>
+        <button class="btn-secondary" onclick="closeEvidenceModal()">إغلاق</button>
       </div>
 
       <form id="evidenceForm">
         <input type="hidden" id="evidenceProgramId" />
 
-        <div class="form-grid">
-          <div>
-            <label for="uploaderName">اسم المعلمة / المنسوبة</label>
-            <input id="uploaderName" type="text" placeholder="اكتبي الاسم" required />
-          </div>
+        <label>اسم المعلمة / المنسوبة</label>
+        <input id="uploaderName" type="text" placeholder="اكتبي الاسم" required />
 
-          <div>
-            <label for="evidenceTitle">عنوان الشاهد</label>
-            <input id="evidenceTitle" type="text" placeholder="مثال: صور تنفيذ البرنامج" required />
-          </div>
+        <label>التصنيف</label>
+        <select id="uploaderRole" required>
+          <option value="مديرة المدرسة">مديرة المدرسة</option>
+          <option value="وكيلة">وكيلة</option>
+          <option value="موجه طلابي">موجه طلابي</option>
+          <option value="إدارية">إدارية</option>
+          <option value="معلمة">معلمة</option>
+        </select>
 
-          <div class="full">
-            <label for="evidenceFile">رفع ملف أو صورة</label>
-            <input id="evidenceFile" type="file" required />
-          </div>
+        <label>عنوان الشاهد</label>
+        <input id="evidenceTitle" type="text" placeholder="مثال: صور تنفيذ البرنامج" required />
 
-          <div class="full">
-            <button type="submit" class="btn-primary">حفظ الشاهد</button>
-          </div>
-        </div>
+        <label>رفع ملف / صورة</label>
+        <input id="evidenceFile" type="file" required />
+
+        <button class="btn-primary" type="submit">حفظ الشاهد</button>
       </form>
 
-      <div style="margin-top:18px;">
-        <h3 style="margin:0 0 10px;">الشواهد المرفوعة</h3>
+      <div style="margin-top:20px;">
+        <h3>الشواهد المرفوعة لهذا البرنامج</h3>
         <div id="evidenceList" class="empty">لا توجد شواهد بعد</div>
       </div>
     </div>
@@ -529,8 +361,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const supabaseUrl = "https://ivspdtyzwacdfjrnrsyh.supabase.co";
-    const supabaseKey = "sb_publishable_tH-vvunLAOM4tfUsLOOzVQ_MPLQn78L";
+    const supabaseUrl = "SUPABASE_URL_HERE";
+    const supabaseKey = "SUPABASE_ANON_KEY_HERE";
     const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     let evidenceCounts = {};
@@ -547,18 +379,18 @@
         .select("id, program_id");
 
       if (error) {
-        console.log("evidence error:", error);
+        console.log("evidence count error", error);
         evidenceCounts = {};
         document.getElementById("metricEvidence").textContent = "0";
         return;
       }
 
       evidenceCounts = {};
-      (data || []).forEach(item => {
+      data.forEach(item => {
         evidenceCounts[item.program_id] = (evidenceCounts[item.program_id] || 0) + 1;
       });
 
-      document.getElementById("metricEvidence").textContent = (data || []).length;
+      document.getElementById("metricEvidence").textContent = data.length;
     }
 
     async function loadPrograms() {
@@ -567,21 +399,19 @@
         .select("*")
         .order("created_at", { ascending: true });
 
-      const container = document.getElementById("programs");
-
       if (error) {
-        console.log("programs error:", error);
-        container.innerHTML = `<div class="empty">تعذر تحميل البرامج</div>`;
+        console.log("programs error", error);
+        document.getElementById("programs").innerHTML = '<div class="empty">تعذر تحميل البرامج</div>';
         document.getElementById("metricPrograms").textContent = "0";
         document.getElementById("metricProgress").textContent = "0%";
         return;
       }
 
-      const rows = data || [];
+      const container = document.getElementById("programs");
       container.innerHTML = "";
 
-      if (!rows.length) {
-        container.innerHTML = `<div class="empty">لا توجد برامج مضافة حاليًا</div>`;
+      if (!data.length) {
+        container.innerHTML = '<div class="empty">لا توجد برامج مضافة بعد</div>';
         document.getElementById("metricPrograms").textContent = "0";
         document.getElementById("metricProgress").textContent = "0%";
         return;
@@ -589,7 +419,7 @@
 
       let totalProgress = 0;
 
-      rows.forEach(program => {
+      data.forEach(program => {
         totalProgress += Number(program.progress || 0);
 
         const card = document.createElement("div");
@@ -597,23 +427,21 @@
 
         card.innerHTML = `
           <h3>${program.program_name || ""}</h3>
-
           <div class="program-meta">
             <div><strong>المجال:</strong> ${program.field || ""}</div>
             <div><strong>المؤشر:</strong> ${program.indicator_name || "غير محدد"}</div>
             <div><strong>المسؤول:</strong> ${program.owner_role || "مشترك"}</div>
-            <div><strong>الحالة:</strong> ${program.status || "قيد التنفيذ"}</div>
+            <div><strong>تاريخ التنفيذ:</strong> ${program.start_date || "غير محدد"}</div>
           </div>
 
-          <div class="program-footer">
-            <div class="badge-row">
-              <span class="badge">الإنجاز: ${program.progress || 0}%</span>
+          <div class="program-actions">
+            <div class="small-badges">
+              <span class="badge">${program.progress || 0}% إنجاز</span>
               <span class="${statusClass(program.status)}">${program.status || "قيد التنفيذ"}</span>
               <span class="badge">الشواهد: ${evidenceCounts[program.id] || 0}</span>
             </div>
 
-            <button class="btn-primary btn-small" type="button"
-              onclick='openEvidenceModal("${program.id}", ${JSON.stringify(program.program_name || "")})'>
+            <button class="btn-primary btn-small" onclick='openEvidenceModal(${JSON.stringify(program.id)}, ${JSON.stringify(program.program_name || "")})'>
               رفع شاهد
             </button>
           </div>
@@ -622,9 +450,9 @@
         container.appendChild(card);
       });
 
-      document.getElementById("metricPrograms").textContent = rows.length;
+      document.getElementById("metricPrograms").textContent = data.length;
       document.getElementById("metricProgress").textContent =
-        Math.round(totalProgress / rows.length) + "%";
+        Math.round(totalProgress / data.length) + "%";
     }
 
     async function loadSwot() {
@@ -633,11 +461,7 @@
         .select("*");
 
       if (error) {
-        console.log("swot error:", error);
-        document.getElementById("swot-strength").innerHTML = "تعذر التحميل";
-        document.getElementById("swot-weakness").innerHTML = "تعذر التحميل";
-        document.getElementById("swot-opportunity").innerHTML = "تعذر التحميل";
-        document.getElementById("swot-threat").innerHTML = "تعذر التحميل";
+        console.log("swot error", error);
         return;
       }
 
@@ -648,10 +472,8 @@
         threat: []
       };
 
-      (data || []).forEach(item => {
-        if (map[item.type]) {
-          map[item.type].push(item.description);
-        }
+      data.forEach(item => {
+        if (map[item.type]) map[item.type].push(item.description);
       });
 
       document.getElementById("swot-strength").innerHTML =
@@ -675,15 +497,18 @@
         indicator_name: document.getElementById("indicator_name").value,
         program_name: document.getElementById("program_name").value,
         owner_role: document.getElementById("owner_role").value || "مشترك",
+        start_date: document.getElementById("start_date").value || null,
         progress: Number(document.getElementById("progress").value || 0),
-        status: document.getElementById("status").value || "قيد التنفيذ"
+        status: document.getElementById("status").value
       };
 
-      const { error } = await supabaseClient.from("programs").insert([payload]);
+      const { error } = await supabaseClient
+        .from("programs")
+        .insert([payload]);
 
       if (error) {
-        console.log("insert program error:", error);
         alert("حدث خطأ أثناء حفظ البرنامج");
+        console.log(error);
         return;
       }
 
@@ -696,7 +521,7 @@
 
     function openEvidenceModal(programId, programName) {
       document.getElementById("evidenceProgramId").value = programId;
-      document.getElementById("modalTitle").textContent = "رفع شاهد - " + programName;
+      document.getElementById("evidenceModalTitle").textContent = "رفع شاهد - " + programName;
       document.getElementById("evidenceModal").style.display = "block";
       document.getElementById("evidenceForm").reset();
       loadEvidenceForProgram(programId);
@@ -716,26 +541,24 @@
       const list = document.getElementById("evidenceList");
 
       if (error) {
-        console.log("load evidence error:", error);
         list.className = "empty";
         list.textContent = "تعذر تحميل الشواهد";
+        console.log(error);
         return;
       }
 
-      const rows = data || [];
-
-      if (!rows.length) {
+      if (!data.length) {
         list.className = "empty";
         list.textContent = "لا توجد شواهد بعد";
         return;
       }
 
-      list.className = "evidence-list";
-      list.innerHTML = rows.map(item => `
-        <div class="evidence-item">
-          <strong>${item.file_name || "شاهد مرفوع"}</strong>
-          <div class="meta">${item.uploaded_by || "غير محدد"}</div>
-          <a href="${item.file_url}" target="_blank">فتح الملف</a>
+      list.className = "";
+      list.innerHTML = data.map(item => `
+        <div style="padding:12px;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:10px;">
+          <strong>${item.file_name || item.title || "شاهد"}</strong><br>
+          <span class="muted">${item.uploaded_by || ""}</span><br>
+          <a href="${item.file_url}" target="_blank">فتح الشاهد</a>
         </div>
       `).join("");
     }
@@ -745,6 +568,7 @@
 
       const programId = document.getElementById("evidenceProgramId").value;
       const uploaderName = document.getElementById("uploaderName").value;
+      const uploaderRole = document.getElementById("uploaderRole").value;
       const title = document.getElementById("evidenceTitle").value;
       const file = document.getElementById("evidenceFile").files[0];
 
@@ -753,44 +577,45 @@
         return;
       }
 
-      const safeName = file.name.replace(/\s+/g, "_");
-      const filePath = `${programId}/${Date.now()}-${safeName}`;
+      const filePath = `${programId}/${Date.now()}-${file.name}`;
 
       const uploadResult = await supabaseClient.storage
         .from("evidence")
         .upload(filePath, file);
 
       if (uploadResult.error) {
-        console.log("upload error:", uploadResult.error);
         alert("حدث خطأ أثناء رفع الملف");
+        console.log(uploadResult.error);
         return;
       }
 
-      const publicData = supabaseClient.storage
+      const publicUrlData = supabaseClient.storage
         .from("evidence")
         .getPublicUrl(filePath);
 
-      const publicUrl = publicData.data.publicUrl;
+      const publicUrl = publicUrlData.data.publicUrl;
 
       const { error } = await supabaseClient
         .from("evidence")
-        .insert([{
-          program_id: programId,
-          file_url: publicUrl,
-          file_name: title,
-          uploaded_by: uploaderName
-        }]);
+        .insert([
+          {
+            program_id: programId,
+            file_url: publicUrl,
+            file_name: title || file.name,
+            uploaded_by: `${uploaderName} | ${uploaderRole}`
+          }
+        ]);
 
       if (error) {
-        console.log("save evidence error:", error);
-        alert("تم رفع الملف لكن تعذر حفظ الشاهد في الجدول");
+        alert("تم رفع الملف لكن تعذر حفظ السجل");
+        console.log(error);
         return;
       }
 
       alert("تم حفظ الشاهد بنجاح");
+      document.getElementById("evidenceForm").reset();
       await loadEvidenceForProgram(programId);
       await refreshAll();
-      document.getElementById("evidenceForm").reset();
     });
 
     async function refreshAll() {
@@ -801,9 +626,7 @@
 
     window.onclick = function(event) {
       const modal = document.getElementById("evidenceModal");
-      if (event.target === modal) {
-        closeEvidenceModal();
-      }
+      if (event.target === modal) closeEvidenceModal();
     };
 
     refreshAll();
