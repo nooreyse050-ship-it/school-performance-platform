@@ -282,7 +282,10 @@
     <button class="btn-primary" type="submit">إرسال طلب التسجيل</button>
   </form>
 </section>
-
+<section class="section" id="adminUsersSection">
+  <h2>طلبات التسجيل</h2>
+  <div id="usersList" class="program-cards"></div>
+</section>
     <section class="section">
   <h2>طلبات التسجيل</h2>
   <div id="usersList" class="program-cards"></div>
@@ -662,11 +665,12 @@ data.forEach(program => {
       await refreshAll();
     });
 
-   async function refreshAll() {
+  async function refreshAll() {
   await loadEvidenceCounts();
   await loadPrograms();
   await loadSwot();
   await loadUsers();
+  applyRoleView();
 }
 
     window.onclick = function(event) {
@@ -770,6 +774,29 @@ async function updateUserStatus(userId, newStatus) {
   alert("تم تحديث حالة المستخدم بنجاح");
   await loadUsers();
 }
+    function applyRoleView() {
+  const role = document.getElementById("currentRole")?.value || "معلمة";
+
+  const adminUsersSection = document.getElementById("adminUsersSection");
+  const programFormSection = document.getElementById("programForm")?.closest(".section");
+
+  if (role === "مديرة") {
+    if (adminUsersSection) adminUsersSection.style.display = "block";
+    if (programFormSection) programFormSection.style.display = "block";
+  } else if (role === "مساعد إداري") {
+    if (adminUsersSection) adminUsersSection.style.display = "none";
+    if (programFormSection) programFormSection.style.display = "block";
+  } else {
+    if (adminUsersSection) adminUsersSection.style.display = "none";
+    if (programFormSection) programFormSection.style.display = "none";
+  }
+}
+
+document.addEventListener("change", function(e) {
+  if (e.target && e.target.id === "currentRole") {
+    applyRoleView();
+  }
+});
     refreshAll();
   </script>
 </body>
