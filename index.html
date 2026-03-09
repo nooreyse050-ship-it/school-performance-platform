@@ -431,31 +431,33 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
     }
 
     async function loadEvidenceCounts() {
-      const { data, error } = await supabaseClient
-        .from("evidence")
-        .select("id, program_id")
-      console.log("evidence data:", data, error);
+  const { data, error } = await supabaseClient
+    .from("evidence")
+    .select("id, program_id");
 
-      if (error) {
-        console.log(error);
-        evidenceCounts = {};
-        return;
-      }
+  console.log("evidence data:", data, error);
 
-      evidenceCounts = {};
-      data.forEach(item => {
-        evidenceCounts[item.program_id] = (evidenceCounts[item.program_id] || 0) + 1;
-      });
+  if (error) {
+    console.log(error);
+    evidenceCounts = {};
+    return;
+  }
 
-      document.getElementById("metricEvidence").textContent = data.length;
+  evidenceCounts = {};
+  data.forEach(item => {
+    evidenceCounts[item.program_id] = (evidenceCounts[item.program_id] || 0) + 1;
+  });
+
+  document.getElementById("metricEvidence").textContent = data.length;
     }
 
     async function loadPrograms() {
   const { data, error } = await supabaseClient
     .from("programs")
     .select("*")
-    .order("id", { ascending: true }
-      console.log("programs data:", data, error);
+    .order("id", { ascending: true });
+
+  console.log("programs data:", data, error);
 
   if (error) {
     console.log(error);
@@ -475,21 +477,17 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     card.innerHTML = `
       <h3>${program.program_name || ""}</h3>
-
       <div class="program-meta">
         <div><strong>المجال:</strong> ${program.field || ""}</div>
         <div><strong>المؤشر:</strong> ${program.indicator_name || "غير محدد"}</div>
         <div><strong>المسؤول:</strong> ${program.owner_role || "مشترك"}</div>
-        <div><strong>تاريخ التنفيذ:</strong> ${program.start_date || "غير محدد"}</div>
       </div>
-
       <div class="program-actions">
         <div class="small-badges">
           <span class="badge">${program.progress || 0}% إنجاز</span>
           <span class="${statusClass(program.status)}">${program.status || "قيد التنفيذ"}</span>
           <span class="badge">الشواهد: ${evidenceCounts[program.id] || 0}</span>
         </div>
-
         <button class="btn-primary btn-small" onclick='openEvidenceModal(${program.id}, ${JSON.stringify(program.program_name || "")})'>
           رفع شاهد
         </button>
@@ -536,65 +534,40 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
     }
 
     async function loadSwot() {
-      const { data, error } = await supabaseClient
-        .from("swot")
-        .select("*")
-      console.log("swot data:", data, error);
+  const { data, error } = await supabaseClient
+    .from("swot")
+    .select("*");
 
-      if (error) {
-        console.log(error);
-        return;
-      }
+  console.log("swot data:", data, error);
 
-      const map = {
-        strength: [],
-        weakness: [],
-        opportunity: [],
-        threat: []
-      };
+  if (error) {
+    console.log(error);
+    return;
+  }
 
-      data.forEach(item => {
-        if (map[item.type]) map[item.type].push(item.description);
-      });
+  const map = {
+    strength: [],
+    weakness: [],
+    opportunity: [],
+    threat: []
+  };
 
-      document.getElementById("swot-strength").innerHTML =
-        map.strength.length ? map.strength.map(x => `• ${x}`).join("<br>") : "لا توجد بيانات";
-      document.getElementById("swot-weakness").innerHTML =
-        map.weakness.length ? map.weakness.map(x => `• ${x}`).join("<br>") : "لا توجد بيانات";
-      document.getElementById("swot-opportunity").innerHTML =
-        map.opportunity.length ? map.opportunity.map(x => `• ${x}`).join("<br>") : "لا توجد بيانات";
-      document.getElementById("swot-threat").innerHTML =
-        map.threat.length ? map.threat.map(x => `• ${x}`).join("<br>") : "لا توجد بيانات";
-    }
+  data.forEach(item => {
+    if (map[item.type]) map[item.type].push(item.description);
+  });
 
-    document.getElementById("programForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
+  document.getElementById("swot-strength").innerHTML =
+    map.strength.length ? map.strength.map(x => `• ${x}`).join("<br>") : "لا توجد بيانات";
 
-      const payload = {
-        field: document.getElementById("field").value,
-        indicator_name: document.getElementById("indicator_name").value,
-        detailed_goal: document.getElementById("detailed_goal").value,
-        program_name: document.getElementById("program_name").value,
-        owner_role: document.getElementById("owner_role").value || "مشترك",
-        start_date: document.getElementById("start_date").value || null,
-        progress: Number(document.getElementById("progress").value || 0),
-        status: document.getElementById("status").value
-      };
+  document.getElementById("swot-weakness").innerHTML =
+    map.weakness.length ? map.weakness.map(x => `• ${x}`).join("<br>") : "لا توجد بيانات";
 
-      const { error } = await supabaseClient.from("programs").insert([payload]);
+  document.getElementById("swot-opportunity").innerHTML =
+    map.opportunity.length ? map.opportunity.map(x => `• ${x}`).join("<br>") : "لا توجد بيانات";
 
-      if (error) {
-        alert("حدث خطأ أثناء حفظ البرنامج");
-        console.log(error);
-        return;
-      }
-
-      alert("تم حفظ البرنامج بنجاح");
-      document.getElementById("programForm").reset();
-      document.getElementById("owner_role").value = "مشترك";
-      document.getElementById("progress").value = 0;
-      await refreshAll();
-    });
+  document.getElementById("swot-threat").innerHTML =
+    map.threat.length ? map.threat.map(x => `• ${x}`).join("<br>") : "لا توجد بيانات";
+}
 
     function openEvidenceModal(programId, programName) {
       document.getElementById("evidenceProgramId").value = programId;
