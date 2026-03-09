@@ -694,9 +694,29 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
     });
 
     async function refreshAll() {
-        await loadEvidenceCounts();
-        await loadPrograms();
-        await loadSwot();
+  try {
+    await loadEvidenceCounts();
+    console.log("evidence loaded");
+  } catch (e) {
+    console.error("loadEvidenceCounts error", e);
+    alert("خطأ في تحميل الشواهد");
+  }
+
+  try {
+    await loadPrograms();
+    console.log("programs loaded");
+  } catch (e) {
+    console.error("loadPrograms error", e);
+    alert("خطأ في تحميل البرامج");
+  }
+
+  try {
+    await loadSwot();
+    console.log("swot loaded");
+  } catch (e) {
+    console.error("loadSwot error", e);
+    alert("خطأ في تحميل SWOT");
+  }
     }
 
     window.onclick = function(event) {
