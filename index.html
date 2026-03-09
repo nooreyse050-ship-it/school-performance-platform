@@ -433,7 +433,8 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
     async function loadEvidenceCounts() {
       const { data, error } = await supabaseClient
         .from("evidence")
-        .select("id, program_id");
+        .select("id, program_id")
+      console.log("evidence data:", data, error);
 
       if (error) {
         console.log(error);
@@ -453,7 +454,8 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
   const { data, error } = await supabaseClient
     .from("programs")
     .select("*")
-    .order("id", { ascending: true });
+    .order("id", { ascending: true }
+      console.log("programs data:", data, error);
 
   if (error) {
     console.log(error);
@@ -536,7 +538,8 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
     async function loadSwot() {
       const { data, error } = await supabaseClient
         .from("swot")
-        .select("*");
+        .select("*")
+      console.log("swot data:", data, error);
 
       if (error) {
         console.log(error);
