@@ -418,36 +418,49 @@ const supabaseKey = "sb_publishable_i0vQ90zclZwHaSFCzHOOfw_Gsfkld9f";
 
       let totalProgress = 0;
 
-      data.forEach(program => {
-        totalProgress += Number(program.progress || 0);
+    let currentField = "";
 
-        const card = document.createElement("div");
-        card.className = "program-card";
+data.forEach(program => {
+  if (program.field !== currentField) {
+    currentField = program.field;
 
-        card.innerHTML = `
-          <h3>${program.program_name || ""}</h3>
-          <div class="program-meta">
-            <div><strong>المجال:</strong> ${program.field || ""}</div>
-            <div><strong>المؤشر:</strong> ${program.indicator_name || "غير محدد"}</div>
-            <div><strong>المسؤول:</strong> ${program.owner_role || "مشترك"}</div>
-            <div><strong>تاريخ التنفيذ:</strong> ${program.start_date || "غير محدد"}</div>
-          </div>
+    const fieldTitle = document.createElement("h2");
+    fieldTitle.style.marginTop = "30px";
+    fieldTitle.style.marginBottom = "12px";
+    fieldTitle.textContent = currentField;
 
-          <div class="program-actions">
-            <div class="small-badges">
-              <span class="badge">${program.progress || 0}% إنجاز</span>
-              <span class="${statusClass(program.status)}">${program.status || "قيد التنفيذ"}</span>
-              <span class="badge">الشواهد: ${evidenceCounts[program.id] || 0}</span>
-            </div>
+    container.appendChild(fieldTitle);
+  }
 
-            <button class="btn-primary btn-small" onclick='openEvidenceModal(${JSON.stringify(program.id)}, ${JSON.stringify(program.program_name || "")})'>
-              رفع شاهد
-            </button>
-          </div>
-        `;
+  totalProgress += Number(program.progress || 0);
 
-        container.appendChild(card);
-      });
+  const card = document.createElement("div");
+  card.className = "program-card";
+
+  card.innerHTML = `
+    <h3>${program.program_name || ""}</h3>
+    <div class="program-meta">
+      <div><strong>المجال:</strong> ${program.field || ""}</div>
+      <div><strong>المؤشر:</strong> ${program.indicator_name || "غير محدد"}</div>
+      <div><strong>المسؤول:</strong> ${program.owner_role || "مشترك"}</div>
+      <div><strong>تاريخ التنفيذ:</strong> ${program.start_date || "غير محدد"}</div>
+    </div>
+
+    <div class="program-actions">
+      <div class="small-badges">
+        <span class="badge">${program.progress || 0}% إنجاز</span>
+        <span class="${statusClass(program.status)}">${program.status || "قيد التنفيذ"}</span>
+        <span class="badge">الشواهد: ${evidenceCounts[program.id] || 0}</span>
+      </div>
+
+      <button class="btn-primary btn-small" onclick='openEvidenceModal(${JSON.stringify(program.id)}, ${JSON.stringify(program.program_name || "")})'>
+        رفع شاهد
+      </button>
+    </div>
+  `;
+
+  container.appendChild(card);
+});
 
       document.getElementById("metricPrograms").textContent = data.length;
       document.getElementById("metricProgress").textContent =
