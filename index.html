@@ -14,638 +14,588 @@
     }
     .container {
       max-width: 1200px;
-      margin: 0 auto;
-      padding: 24px;
+      margin: auto;
+      padding: 20px;
     }
-    .header {
+    .hero, .card, .section, .modal-content {
       background: #fff;
-      border: 1px solid #e5e7eb;
       border-radius: 24px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
     }
-    .header h1 {
-      margin: 0 0 8px;
-      font-size: 32px;
+    .hero {
+      padding: 28px;
+      margin-bottom: 20px;
+      text-align: center;
     }
-    .header p {
-      margin: 6px 0;
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 34px;
+    }
+    .hero p {
+      margin: 8px 0;
       color: #4b5563;
+      line-height: 1.8;
     }
-    .layout {
+    .grid {
       display: grid;
-      grid-template-columns: 240px 1fr;
-      gap: 24px;
+      gap: 16px;
     }
-    .sidebar, .panel {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 24px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    .grid-4 {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     }
-    .sidebar {
-      padding: 16px;
-      height: fit-content;
+    .card {
+      padding: 18px;
     }
-    .sidebar h3 {
-      margin: 8px 8px 14px;
-      font-size: 15px;
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
       color: #6b7280;
     }
-    .nav-btn {
-      width: 100%;
-      border: 0;
-      margin-bottom: 10px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: #f8fafc;
-      color: #374151;
-      text-align: right;
-      cursor: pointer;
-      font-size: 14px;
+    .metric {
+      font-size: 28px;
+      font-weight: bold;
     }
-    .nav-btn.active {
+    .roles-box {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 16px;
+      background: #eef2ff;
+      color: #1e3a8a;
+      line-height: 1.9;
+    }
+    .section {
+      padding: 24px;
+      margin-top: 20px;
+    }
+    .section h2 {
+      margin-top: 0;
+      margin-bottom: 18px;
+      font-size: 30px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 14px;
+      font-size: 15px;
+      margin-bottom: 14px;
+      background: #fff;
+    }
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    .btn-primary {
       background: #1f2937;
       color: #fff;
     }
-    .content {
-      display: grid;
-      gap: 24px;
-    }
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 16px;
-    }
-    .card {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 24px;
-      padding: 18px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .card .label {
-      color: #6b7280;
-      font-size: 14px;
-    }
-    .card .value {
-      font-size: 30px;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-    .panel {
-      padding: 24px;
-    }
-    .panel h2 {
-      margin-top: 0;
-      margin-bottom: 18px;
-      font-size: 24px;
-    }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-    }
-    .mini-box {
-      border: 1px solid #e5e7eb;
-      background: #f8fafc;
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-    .progress-wrap { margin-bottom: 16px; }
-    .progress-head {
-      display: flex;
-      justify-content: space-between;
-      font-size: 14px;
-      margin-bottom: 8px;
-      color: #374151;
-    }
-    .progress {
+    .btn-secondary {
       background: #e5e7eb;
-      height: 10px;
-      border-radius: 999px;
-      overflow: hidden;
+      color: #111827;
     }
-    .progress > span {
-      display: block;
-      height: 100%;
-      background: #334155;
-      border-radius: 999px;
+    .btn-small {
+      padding: 8px 12px;
+      font-size: 13px;
+      border-radius: 10px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 14px;
+      margin-top: 14px;
+      background: #fff;
     }
     th, td {
-      padding: 12px;
       border-bottom: 1px solid #e5e7eb;
+      padding: 12px 10px;
       text-align: right;
+      vertical-align: middle;
+      font-size: 14px;
     }
-    th { color: #6b7280; }
+    th {
+      background: #f9fafb;
+      color: #374151;
+    }
     .badge {
       display: inline-block;
       padding: 6px 10px;
       border-radius: 999px;
-      background: #f1f5f9;
+      background: #eef2ff;
+      color: #1e3a8a;
       font-weight: bold;
       font-size: 13px;
     }
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-    .form-group label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 14px;
+    .status {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
       font-weight: bold;
-      color: #374151;
     }
-    .form-group input, .form-group select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 14px;
-      background: #fff;
-      font-size: 14px;
+    .status-running { background: #fef3c7; color: #92400e; }
+    .status-done { background: #dcfce7; color: #166534; }
+    .status-late { background: #fee2e2; color: #991b1b; }
+    .muted {
+      color: #6b7280;
     }
-    .save-btn {
-      margin-top: 18px;
-      border: 0;
-      background: #1f2937;
-      color: #fff;
-      padding: 14px 18px;
+    .swot-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    .swot-box {
+      border-radius: 18px;
+      padding: 16px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+    .swot-box h3 {
+      margin-top: 0;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 999;
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .modal-content {
+      max-width: 620px;
+      margin: 40px auto;
+      padding: 24px;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .modal-header h3 {
+      margin: 0;
+    }
+    .evidence-list a {
+      word-break: break-word;
+    }
+    .empty {
+      padding: 20px;
+      text-align: center;
+      color: #6b7280;
+      background: #f9fafb;
       border-radius: 16px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .hidden { display: none; }
-    ul { margin: 0; padding-right: 18px; }
-    li { margin-bottom: 8px; }
-    @media (max-width: 900px) {
-      .layout, .grid-2, .cards, .form-grid {
-        grid-template-columns: 1fr;
-      }
+      margin-top: 12px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
+    <section class="hero">
       <h1>منصة قيادة الأداء المدرسي</h1>
       <p>النخيل الابتدائية بالقطيف – طفولة مبكرة والروضة الملحقة بها</p>
-      <p>لوحة متكاملة لمتابعة الخطة التشغيلية ومؤشرات الأداء والتوثيق المؤسسي.</p>
-    </div>
+      <p>لوحة متكاملة لمتابعة الخطة التشغيلية ومؤشرات الأداء والتوثيق المؤسسي</p>
 
-    <div class="layout">
-      <div class="sidebar">
-        <h3>أقسام المنصة</h3>
-        <button class="nav-btn active" onclick="showTab('dashboard', this)">لوحة القيادة</button>
-        <button class="nav-btn" onclick="showTab('programs', this)">الخطة التشغيلية</button>
-        <button class="nav-btn" onclick="showTab('swot', this)">تحليل SWOT</button>
-        <button class="nav-btn" onclick="showTab('evidence', this)">الشواهد والتوثيق</button>
-        <button class="nav-btn" onclick="showTab('reports', this)">التقارير</button>
+      <div class="roles-box">
+        <strong>تصنيفات الاستخدام داخل المنصة:</strong><br>
+        مديرة المدرسة – وكيلة – موجه طلابي – إدارية – معلمة
       </div>
-<button onclick="addEvidence(${program.id})">
-رفع شاهد
-</button>
-      <div class="content">
-        <div id="dashboard" class="tab-section">
-          <div class="cards">
-            <div class="card"><div class="label">نسبة إنجاز الخطة</div><div class="value">76%</div></div>
-            <div class="card"><div class="label">البرامج المتقدمة</div><div class="value">3</div></div>
-            <div class="card"><div class="label">البرامج المتأخرة</div><div class="value">1</div></div>
-            <div class="card"><div class="label">إجمالي الشواهد</div><div class="value">26</div></div>
-            <div class="card"><div class="label">جاهزية الزيارة الإشرافية</div><div class="value">82%</div></div>
-          </div>
+    </section>
 
-          <div class="grid-2" style="margin-top:24px;">
-            <div class="panel">
-              <h2>مؤشرات المجالات</h2>
-              <div class="progress-wrap">
-                <div class="progress-head"><span>القيادة المدرسية</span><span>85%</span></div>
-                <div class="progress"><span style="width:85%"></span></div>
-              </div>
-              <div class="progress-wrap">
-                <div class="progress-head"><span>التعليم والتعلم</span><span>72%</span></div>
-                <div class="progress"><span style="width:72%"></span></div>
-              </div>
-              <div class="progress-wrap">
-                <div class="progress-head"><span>نواتج التعلم</span><span>67%</span></div>
-                <div class="progress"><span style="width:67%"></span></div>
-              </div>
-              <div class="progress-wrap">
-                <div class="progress-head"><span>البيئة المدرسية</span><span>91%</span></div>
-                <div class="progress"><span style="width:91%"></span></div>
-              </div>
-              <div class="progress-wrap">
-                <div class="progress-head"><span>الشراكة المجتمعية</span><span>64%</span></div>
-                <div class="progress"><span style="width:64%"></span></div>
-              </div>
-            </div>
+    <section class="grid grid-4">
+      <div class="card">
+        <h3>إجمالي البرامج</h3>
+        <div class="metric" id="metricPrograms">0</div>
+      </div>
+      <div class="card">
+        <h3>إجمالي الشواهد</h3>
+        <div class="metric" id="metricEvidence">0</div>
+      </div>
+      <div class="card">
+        <h3>متوسط الإنجاز</h3>
+        <div class="metric" id="metricProgress">0%</div>
+      </div>
+      <div class="card">
+        <h3>عدد المستخدمين المستهدف</h3>
+        <div class="metric">42</div>
+      </div>
+    </section>
 
-            <div class="panel">
-              <h2>قراءة إدارية سريعة</h2>
-              <div class="mini-box">أعلى مجال أداء حاليًا: البيئة المدرسية.</div>
-              <div class="mini-box">الأولوية القادمة: رفع جودة التوثيق ومتابعة برامج نواتج التعلم.</div>
-              <div class="mini-box">التوصية: الاستمرار في ربط كل برنامج بالمؤشر المرتبط والشاهد التنفيذي.</div>
-            </div>
-          </div>
+    <section class="section">
+      <h2>إضافة برنامج في الخطة التشغيلية</h2>
+      <form id="programForm">
+        <label>المجال</label>
+        <select id="field" required>
+          <option value="القيادة والإدارة المدرسية">القيادة والإدارة المدرسية</option>
+          <option value="التعليم والتعلم">التعليم والتعلم</option>
+          <option value="البيئة المدرسية">البيئة المدرسية</option>
+          <option value="نواتج التعلم">نواتج التعلم</option>
+        </select>
+
+        <label>المؤشر المرتبط</label>
+        <input id="indicator_name" type="text" placeholder="اكتبي المؤشر" />
+
+        <label>الهدف</label>
+        <input id="detailed_goal" type="text" placeholder="اكتبي الهدف" />
+
+        <label>اسم البرنامج</label>
+        <input id="program_name" type="text" placeholder="اكتبي اسم البرنامج" required />
+
+        <label>المسؤول عن التنفيذ</label>
+        <input id="owner_role" type="text" value="مشترك" />
+
+        <label>تاريخ التنفيذ</label>
+        <input id="start_date" type="date" />
+
+        <label>نسبة الإنجاز</label>
+        <input id="progress" type="number" min="0" max="100" value="0" />
+
+        <label>الحالة</label>
+        <select id="status">
+          <option value="قيد التنفيذ">قيد التنفيذ</option>
+          <option value="منجز">منجز</option>
+          <option value="متأخر">متأخر</option>
+        </select>
+
+        <button class="btn-primary" type="submit">حفظ البرنامج</button>
+      </form>
+    </section>
+
+    <section class="section">
+      <h2>برامج الخطة التشغيلية</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>المجال</th>
+            <th>المؤشر</th>
+            <th>البرنامج</th>
+            <th>المسؤول</th>
+            <th>التاريخ</th>
+            <th>الإنجاز</th>
+            <th>الحالة</th>
+            <th>الشواهد</th>
+            <th>إجراء</th>
+          </tr>
+        </thead>
+        <tbody id="programs"></tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>تحليل SWOT</h2>
+      <div class="swot-grid">
+        <div class="swot-box">
+          <h3>نقاط القوة</h3>
+          <div id="swot-strength" class="muted">جاري التحميل...</div>
         </div>
-
-        <div id="programs" class="tab-section hidden">
-          <div class="panel">
-            <h2>إضافة برنامج في الخطة التشغيلية</h2>
-            <div class="form-grid">
-              <div class="form-group">
-                <label>المجال</label>
-                <select>
-                  <option>القيادة المدرسية</option>
-                  <option>التعليم والتعلم</option>
-                  <option>نواتج التعلم</option>
-                  <option>البيئة المدرسية</option>
-                  <option>الشراكة المجتمعية</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>المؤشر المرتبط</label>
-                <input value="متابعة الأداء المدرسي" />
-              </div>
-              <div class="form-group">
-                <label>الهدف</label>
-                <input placeholder="اكتبي الهدف" />
-              </div>
-              <div class="form-group">
-                <label>اسم البرنامج</label>
-                <input placeholder="اكتبي اسم البرنامج" />
-              </div>
-              <div class="form-group">
-                <label>المسؤول عن التنفيذ</label>
-                <input placeholder="اكتبي اسم المسؤول" />
-              </div>
-              <div class="form-group">
-                <label>اللجنة/الفريق</label>
-                <input placeholder="اكتبي اسم اللجنة" />
-              </div>
-              <div class="form-group">
-                <label>تاريخ التنفيذ</label>
-                <input type="date" />
-              </div>
-              <div class="form-group">
-                <label>نسبة الإنجاز</label>
-                <input type="number" placeholder="0 - 100" />
-              </div>
-              <div class="form-group">
-                <label>الحالة</label>
-                <select>
-                  <option>قيد التنفيذ</option>
-                  <option>منجز جزئيًا</option>
-                  <option>منجز</option>
-                  <option>متأخر</option>
-                </select>
-              </div>
-            </div>
-            <button class="save-btn">حفظ البرنامج</button>
-          </div>
-          <div class="panel" style="margin-top:24px;">
-            <h2>برامج الخطة التشغيلية</h2>
-            <table>
-              <thead>
-                <tr>
-                  <th>المجال</th>
-                  <th>المؤشر</th>
-                  <th>البرنامج</th>
-                  <th>المسؤول</th>
-                  <th>التاريخ</th>
-                  <th>الإنجاز</th>
-                  <th>الشواهد</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>القيادة المدرسية</td>
-                  <td>متابعة الأداء المدرسي</td>
-                  <td>برنامج التوثيق المؤسسي</td>
-                  <td>مديرة المدرسة</td>
-                  <td>2026-04-15</td>
-                  <td><span class="badge">85%</span></td>
-                  <td>6</td>
-                </tr>
-                <tr>
-                  <td>التعليم والتعلم</td>
-                  <td>جودة الممارسات التدريسية</td>
-                  <td>مبادرة الفهم القرائي</td>
-                  <td>لجنة التحصيل الدراسي</td>
-                  <td>2026-04-22</td>
-                  <td><span class="badge">72%</span></td>
-                  <td>4</td>
-                </tr>
-                <tr>
-                  <td>نواتج التعلم</td>
-                  <td>تحسن التحصيل</td>
-                  <td>خطة علاج الفاقد التعليمي</td>
-                  <td>فريق المواد الأساسية</td>
-                  <td>2026-05-05</td>
-                  <td><span class="badge">67%</span></td>
-                  <td>5</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <div class="swot-box">
+          <h3>نقاط الضعف</h3>
+          <div id="swot-weakness" class="muted">جاري التحميل...</div>
         </div>
-
-        <div id="swot" class="tab-section hidden">
-          <div class="panel">
-            <h2>تحليل SWOT</h2>
-            <div class="grid-2">
-              <div class="mini-box">
-                <h3>نقاط القوة</h3>
-                <ul>
-                  <li>استقرار الكادر</li>
-                  <li>دعم الإدارة</li>
-                  <li>وجود مبادرات نوعية</li>
-                </ul>
-              </div>
-              <div class="mini-box">
-                <h3>نقاط الضعف</h3>
-                <ul>
-                  <li>تفاوت التوثيق</li>
-                  <li>ضغط الأعمال الموسمية</li>
-                  <li>تأخر تحديث بعض المؤشرات</li>
-                </ul>
-              </div>
-              <div class="mini-box">
-                <h3>الفرص</h3>
-                <ul>
-                  <li>الشراكات المجتمعية</li>
-                  <li>المنصات الرقمية</li>
-                  <li>برامج التطوير المهني</li>
-                </ul>
-              </div>
-              <div class="mini-box">
-                <h3>التحديات</h3>
-                <ul>
-                  <li>الغياب</li>
-                  <li>ضيق الوقت التنفيذي</li>
-                  <li>تفاوت التزام بعض الفرق</li>
-                </ul>
-              </div>
-            </div>
-          </div>
+        <div class="swot-box">
+          <h3>الفرص</h3>
+          <div id="swot-opportunity" class="muted">جاري التحميل...</div>
         </div>
-
-        <div id="evidence" class="tab-section hidden">
-          <div class="panel">
-            <h2>الشواهد والتوثيق</h2>
-            <div class="grid-2">
-              <div class="mini-box">
-                <strong>تقرير تفعيل مبادرة الفهم القرائي</strong>
-                <div style="margin-top:8px;color:#4b5563;">النوع: تقرير</div>
-                <div style="margin-top:4px;color:#4b5563;">البرنامج المرتبط: مبادرة الفهم القرائي</div>
-              </div>
-              <div class="mini-box">
-                <strong>صور البيئة الجاذبة</strong>
-                <div style="margin-top:8px;color:#4b5563;">النوع: صور</div>
-                <div style="margin-top:4px;color:#4b5563;">البرنامج المرتبط: مبادرة البيئة الجاذبة</div>
-              </div>
-              <div class="mini-box">
-                <strong>محضر متابعة التوثيق المؤسسي</strong>
-                <div style="margin-top:8px;color:#4b5563;">النوع: محضر</div>
-                <div style="margin-top:4px;color:#4b5563;">البرنامج المرتبط: برنامج التوثيق المؤسسي</div>
-              </div>
-            </div>
-          </div>
+        <div class="swot-box">
+          <h3>التحديات</h3>
+          <div id="swot-threat" class="muted">جاري التحميل...</div>
         </div>
+      </div>
+    </section>
+  </div>
 
-        <div id="reports" class="tab-section hidden">
-          <div class="panel">
-            <h2>التقارير</h2>
-            <div class="cards" style="grid-template-columns:repeat(3,1fr);">
-              <div class="card">
-                <div class="label">تقرير الإنجاز العام</div>
-                <div class="value">76%</div>
-                <div style="margin-top:8px;color:#4b5563;font-size:14px;">متوسط التنفيذ لجميع البرامج.</div>
-              </div>
-              <div class="card">
-                <div class="label">عدد البرامج المتقدمة</div>
-                <div class="value">3</div>
-                <div style="margin-top:8px;color:#4b5563;font-size:14px;">البرامج التي تجاوزت 80٪.</div>
-              </div>
-              <div class="card">
-                <div class="label">مؤشر الجاهزية</div>
-                <div class="value">82%</div>
-                <div style="margin-top:8px;color:#4b5563;font-size:14px;">مؤشر جاهزية الزيارة الإشرافية.</div>
-              </div>
-            </div>
-            <div class="mini-box" style="margin-top:20px;">
-              التوصية العامة: الاستمرار في متابعة برامج نواتج التعلم، وتعزيز اكتمال الشواهد وربطها بالمؤشرات ذات الأولوية.
-            </div>
-          </div>
-        </div>
+  <div class="modal" id="evidenceModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="evidenceModalTitle">رفع شاهد</h3>
+        <button class="btn-secondary" onclick="closeEvidenceModal()">إغلاق</button>
+      </div>
 
+      <form id="evidenceForm">
+        <input type="hidden" id="evidenceProgramId" />
+
+        <label>اسم المعلمة / المنسوبة</label>
+        <input id="uploaderName" type="text" placeholder="اكتبي الاسم" required />
+
+        <label>التصنيف</label>
+        <select id="uploaderRole" required>
+          <option value="مديرة المدرسة">مديرة المدرسة</option>
+          <option value="وكيلة">وكيلة</option>
+          <option value="موجه طلابي">موجه طلابي</option>
+          <option value="إدارية">إدارية</option>
+          <option value="معلمة">معلمة</option>
+        </select>
+
+        <label>عنوان الشاهد</label>
+        <input id="evidenceTitle" type="text" placeholder="مثال: صور تنفيذ البرنامج" required />
+
+        <label>رفع ملف / صورة</label>
+        <input id="evidenceFile" type="file" required />
+
+        <button class="btn-primary" type="submit">حفظ الشاهد</button>
+      </form>
+
+      <div style="margin-top:20px;">
+        <h3>الشواهد المرفوعة لهذا البرنامج</h3>
+        <div id="evidenceList" class="evidence-list empty">لا توجد شواهد بعد</div>
       </div>
     </div>
   </div>
 
-  <div id="programs"></div>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const supabaseUrl = "https://tbkvowcsfgzyuengkbdo.supabase.co";
-const supabaseKey = "sb_publishable_ALIdTPrjJ2662wJYshbmxg_HlYlAqP6";
-const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-async function loadPrograms() {
-  const { data, error } = await supabaseClient
-    .from("programs")
-    .select("*");
-
-  if (error) {
-    console.log(error);
-    return;
-  }
-
-  const container = document.getElementById("programs");
-  if (!container) return;
-
-  container.innerHTML = "";
-
-  data.forEach(program => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-  <td>${program.field || ""}</td>
-  <td>${program.indicator_name || ""}</td>
-  <td>${program.program_name || ""}</td>
-  <td>${program.owner_role || "مشترك"}</td>
-  <td>${program.start_date || ""}</td>
-  <td>
-    <button onclick="addEvidence(${program.id}, '${program.program_name}')" style="background:#1f2937;color:#fff;border:none;padding:8px 12px;border-radius:10px;cursor:pointer;">
-      رفع شاهد
-    </button>
-  </td>
-`;
-
-loadPrograms();
-</script>
   <script>
-    function showTab(tabId, btn) {
-      document.querySelectorAll('.tab-section').forEach(section => {
-        section.classList.add('hidden');
-      });
-      document.getElementById(tabId).classList.remove('hidden');
+    const supabaseUrl = "https://tbkvowcsfgzyuengkbdo.supabase.co";
+    const supabaseKey = "sb_publishable_ALIdTPrjJ2662wJYshbmxg_HlYlAqP6";
+    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-      document.querySelectorAll('.nav-btn').forEach(button => {
-        button.classList.remove('active');
-      });
-      btn.classList.add('active');
+    let evidenceCounts = {};
+
+    function statusClass(status) {
+      if (status === "منجز") return "status status-done";
+      if (status === "متأخر") return "status status-late";
+      return "status status-running";
     }
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-<script>
-const supabaseUrl = "https://tbkvowcsfgzyuengkbdo.supabase.co";
+    async function loadEvidenceCounts() {
+      const { data, error } = await supabaseClient
+        .from("evidence")
+        .select("id, program_id");
 
-const supabaseKey = "sb_publishable_ALIdTPrjJ2662wJYshbmxg_HlYlAqP6";
-
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
-console.log("Supabase Connected");
-</script>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-<script>
-const supabaseUrl = "https://tbkvowcsfgzyuengkbdo.supabase.co";
-
-const supabaseKey = "sb_publishable_ALIdTPrjJ2662wJYshbmxg_HlYlAqP6";
-
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-console.log("Supabase Connected");
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-<script>
-const supabaseUrl = "https://tbkvowcsfgzyuengkbdo.supabase.co";
-
-const supabaseKey = "sb_publishable_ALIdTPrjJ2662wJYshbmxg_HlYlAqP6";
-
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
-console.log("Supabase Connected");
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-
-const supabaseUrl = "https://tbkvowcsfgzyuengkbdo.supabase.co"
-
-const supabaseKey = "sb_publishable_ALIdTPrjJ2662wJYshbmxg_HlYlAqP6"
-
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
-
-
-async function loadPrograms(){
-
-const { data, error } = await supabase
-.from("programs")
-.select("*")
-
-if(error){
-console.log(error)
-return
-}
-
-const container = document.getElementById("programs")
-
-data.forEach(program => {
-
-const div = document.createElement("div")
-
-div.innerHTML = `
-<h3>${program.program_name}</h3>
-<p>المجال: ${program.field}</p>
-<p>نسبة الإنجاز: ${program.progress}%</p>
-<hr>
-`
-
-container.appendChild(div)
-
-})
-
-}
-
-loadPrograms()
-
-</script>
-  <script>
-async function addEvidence(programId, programName) {
-  const teacherName = prompt("أدخلي اسم المعلمة / المنسوبة:");
-  if (!teacherName) return;
-
-  const title = prompt("أدخلي عنوان الشاهد للبرنامج: " + programName);
-  if (!title) return;
-
-  const fileUrl = prompt("أدخلي رابط الشاهد أو اسم الملف:");
-  if (!fileUrl) return;
-
-  const { error } = await supabaseClient
-    .from("evidence")
-    .insert([
-      {
-        program_id: programId,
-        title: title,
-        file_url: fileUrl,
-        note: teacherName,
-        evidence_type: "رابط"
+      if (error) {
+        console.log(error);
+        evidenceCounts = {};
+        return;
       }
-    ]);
 
-  if (error) {
-    alert("حدث خطأ أثناء حفظ الشاهد");
-    console.log(error);
-    return;
-  }
+      evidenceCounts = {};
+      data.forEach(item => {
+        evidenceCounts[item.program_id] = (evidenceCounts[item.program_id] || 0) + 1;
+      });
 
-  alert("تم حفظ الشاهد بنجاح");
-}
-  </script>
-  <script>
-async function addEvidence(programId, programName) {
-  const teacherName = prompt("أدخلي اسم المعلمة / المنسوبة:");
-  if (!teacherName) return;
+      document.getElementById("metricEvidence").textContent = data.length;
+    }
 
-  const title = prompt("أدخلي عنوان الشاهد للبرنامج: " + programName);
-  if (!title) return;
+    async function loadPrograms() {
+      const { data, error } = await supabaseClient
+        .from("programs")
+        .select("*")
+        .order("id", { ascending: true });
 
-  const fileUrl = prompt("أدخلي رابط الشاهد أو اسم الملف:");
-  if (!fileUrl) return;
-
-  const { error } = await supabaseClient
-    .from("evidence")
-    .insert([
-      {
-        program_id: programId,
-        title: title,
-        file_url: fileUrl,
-        note: teacherName,
-        evidence_type: "رابط"
+      if (error) {
+        console.log(error);
+        return;
       }
-    ]);
 
-  if (error) {
-    alert("حدث خطأ أثناء حفظ الشاهد");
-    console.log(error);
-    return;
-  }
+      const container = document.getElementById("programs");
+      container.innerHTML = "";
 
-  alert("تم حفظ الشاهد بنجاح");
-}
+      let totalProgress = 0;
+      data.forEach(program => {
+        totalProgress += Number(program.progress || 0);
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${program.field || ""}</td>
+          <td>${program.indicator_name || ""}</td>
+          <td>${program.program_name || ""}</td>
+          <td>${program.owner_role || "مشترك"}</td>
+          <td>${program.start_date || ""}</td>
+          <td><span class="badge">${program.progress || 0}%</span></td>
+          <td><span class="${statusClass(program.status)}">${program.status || "قيد التنفيذ"}</span></td>
+          <td>${evidenceCounts[program.id] || 0}</td>
+          <td>
+            <button class="btn-primary btn-small" onclick='openEvidenceModal(${program.id}, ${JSON.stringify(program.program_name || "")})'>
+              رفع شاهد
+            </button>
+          </td>
+        `;
+        container.appendChild(row);
+      });
+
+      document.getElementById("metricPrograms").textContent = data.length;
+      document.getElementById("metricProgress").textContent =
+        data.length ? Math.round(totalProgress / data.length) + "%" : "0%";
+    }
+
+    async function loadSwot() {
+      const { data, error } = await supabaseClient
+        .from("swot")
+        .select("*");
+
+      if (error) {
+        console.log(error);
+        return;
+      }
+
+      const map = {
+        strength: [],
+        weakness: [],
+        opportunity: [],
+        threat: []
+      };
+
+      data.forEach(item => {
+        if (map[item.type]) map[item.type].push(item.description);
+      });
+
+      document.getElementById("swot-strength").innerHTML =
+        map.strength.length ? map.strength.map(x => `• ${x}`).join("<br>") : "لا توجد بيانات";
+      document.getElementById("swot-weakness").innerHTML =
+        map.weakness.length ? map.weakness.map(x => `• ${x}`).join("<br>") : "لا توجد بيانات";
+      document.getElementById("swot-opportunity").innerHTML =
+        map.opportunity.length ? map.opportunity.map(x => `• ${x}`).join("<br>") : "لا توجد بيانات";
+      document.getElementById("swot-threat").innerHTML =
+        map.threat.length ? map.threat.map(x => `• ${x}`).join("<br>") : "لا توجد بيانات";
+    }
+
+    document.getElementById("programForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const payload = {
+        field: document.getElementById("field").value,
+        indicator_name: document.getElementById("indicator_name").value,
+        detailed_goal: document.getElementById("detailed_goal").value,
+        program_name: document.getElementById("program_name").value,
+        owner_role: document.getElementById("owner_role").value || "مشترك",
+        start_date: document.getElementById("start_date").value || null,
+        progress: Number(document.getElementById("progress").value || 0),
+        status: document.getElementById("status").value
+      };
+
+      const { error } = await supabaseClient.from("programs").insert([payload]);
+
+      if (error) {
+        alert("حدث خطأ أثناء حفظ البرنامج");
+        console.log(error);
+        return;
+      }
+
+      alert("تم حفظ البرنامج بنجاح");
+      document.getElementById("programForm").reset();
+      document.getElementById("owner_role").value = "مشترك";
+      document.getElementById("progress").value = 0;
+      await refreshAll();
+    });
+
+    function openEvidenceModal(programId, programName) {
+      document.getElementById("evidenceProgramId").value = programId;
+      document.getElementById("evidenceModalTitle").textContent = "رفع شاهد - " + programName;
+      document.getElementById("evidenceModal").style.display = "block";
+      document.getElementById("evidenceForm").reset();
+      loadEvidenceForProgram(programId);
+    }
+
+    function closeEvidenceModal() {
+      document.getElementById("evidenceModal").style.display = "none";
+    }
+
+    async function loadEvidenceForProgram(programId) {
+      const { data, error } = await supabaseClient
+        .from("evidence")
+        .select("*")
+        .eq("program_id", programId)
+        .order("id", { ascending: false });
+
+      const list = document.getElementById("evidenceList");
+
+      if (error) {
+        list.className = "empty";
+        list.textContent = "تعذر تحميل الشواهد";
+        console.log(error);
+        return;
+      }
+
+      if (!data.length) {
+        list.className = "empty";
+        list.textContent = "لا توجد شواهد بعد";
+        return;
+      }
+
+      list.className = "";
+      list.innerHTML = data.map(item => `
+        <div style="padding:12px;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:10px;">
+          <strong>${item.title || ""}</strong><br>
+          <span class="muted">${item.note || ""}</span><br>
+          <a href="${item.file_url}" target="_blank">فتح الشاهد</a>
+        </div>
+      `).join("");
+    }
+
+    document.getElementById("evidenceForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const programId = Number(document.getElementById("evidenceProgramId").value);
+      const uploaderName = document.getElementById("uploaderName").value;
+      const uploaderRole = document.getElementById("uploaderRole").value;
+      const title = document.getElementById("evidenceTitle").value;
+      const file = document.getElementById("evidenceFile").files[0];
+
+      if (!file) {
+        alert("يرجى اختيار ملف أو صورة");
+        return;
+      }
+
+      const filePath = `${programId}/${Date.now()}-${file.name}`;
+
+      const uploadResult = await supabaseClient.storage
+        .from("evidence")
+        .upload(filePath, file);
+
+      if (uploadResult.error) {
+        alert("حدث خطأ أثناء رفع الملف");
+        console.log(uploadResult.error);
+        return;
+      }
+
+      const publicUrlData = supabaseClient.storage
+        .from("evidence")
+        .getPublicUrl(filePath);
+
+      const publicUrl = publicUrlData.data.publicUrl;
+
+      const { error } = await supabaseClient
+        .from("evidence")
+        .insert([
+          {
+            program_id: programId,
+            title: title,
+            file_url: publicUrl,
+            evidence_type: file.type || "file",
+            note: `${uploaderName} | ${uploaderRole}`
+          }
+        ]);
+
+      if (error) {
+        alert("تم رفع الملف لكن تعذر حفظ الشاهد في الجدول");
+        console.log(error);
+        return;
+      }
+
+      alert("تم حفظ الشاهد بنجاح");
+      await loadEvidenceForProgram(programId);
+      await refreshAll();
+      document.getElementById("evidenceForm").reset();
+    });
+
+    async function refreshAll() {
+      await loadEvidenceCounts();
+      await loadPrograms();
+      await loadSwot();
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById("evidenceModal");
+      if (event.target === modal) closeEvidenceModal();
+    };
+
+    refreshAll();
   </script>
 </body>
 </html>
