@@ -694,9 +694,10 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
     });
 
     async function refreshAll() {
-      await loadEvidenceCounts();
-      await loadPrograms();
-      await loadSwot();
+  await loadEvidenceCounts();
+  await loadPrograms();
+  await loadSwot();
+    }
     }
 
     window.onclick = function(event) {
