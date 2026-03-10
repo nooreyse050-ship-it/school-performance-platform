@@ -264,6 +264,7 @@
         <div class="metric">1</div>
       </div>
     </section>
+    
 <section class="section">
   <h2>تسجيل مستخدم جديد</h2>
   <form id="registerForm">
@@ -285,6 +286,16 @@
 <section class="section" id="adminUsersSection">
   <h2>طلبات التسجيل</h2>
   <div id="usersList" class="program-cards"></div>
+</section>
+
+    <section class="section" id="activeUsersSection">
+  <h2>المستخدمون النشطون</h2>
+  <div id="activeUsersList" class="program-cards"></div>
+    </section>
+
+    <section class="section" id="blockedUsersSection">
+  <h2>المستخدمون الموقوفون</h2>
+  <div id="blockedUsersList" class="program-cards"></div>
 </section>
     
     <section class="section">
@@ -695,65 +706,134 @@ data.forEach(program => {
   alert("تم إرسال طلب التسجيل بنجاح، وبانتظار اعتماد الإدارة");
   document.getElementById("registerForm").reset();
 });
-    async function loadUsers() {
+  async function loadUsers() {
   const { data, error } = await supabaseClient
     .from("users")
     .select("*")
     .order("created_at", { ascending: false });
 
-  const container = document.getElementById("usersList");
-  if (!container) return;
+ const pendingContainer = document.getElementById("usersList");
+const activeContainer = document.getElementById("activeUsersList");
+const blockedContainer = document.getElementById("blockedUsersList");
+
+if (!pendingContainer || !activeContainer || !blockedContainer) return;
 
   if (error) {
     console.log(error);
-    container.innerHTML = '<div class="empty">تعذر تحميل المستخدمين</div>';
+    pendingContainer.innerHTML = '<div class="empty">تعذر تحميل طلبات التسجيل</div>';
+    activeContainer.innerHTML = '<div class="empty">تعذر تحميل المستخدمين النشطين</div>';
     return;
   }
 
-  if (!data.length) {
-    container.innerHTML = '<div class="empty">لا توجد طلبات تسجيل بعد</div>';
-    return;
+ const pendingUsers = data.filter(user => user.status === "pending");
+const activeUsers = data.filter(user => user.status === "active");
+const blockedUsers = data.filter(user => user.status === "blocked");
+
+  if (!pendingUsers.length) {
+    pendingContainer.innerHTML = '<div class="empty">لا توجد طلبات تسجيل بانتظار الموافقة</div>';
+  } else {
+    pendingContainer.innerHTML = "";
+    pendingUsers.forEach(user => {
+      const card = document.createElement("div");
+      card.className = "program-card";
+
+      card.innerHTML = `
+        <h3>${user.name || ""}</h3>
+        <div class="program-meta">
+          <div><strong>البريد:</strong> ${user.email || ""}</div>
+          <div><strong>الدور:</strong> ${user.role || ""}</div>
+          <div><strong>الحالة:</strong> بانتظار الموافقة</div>
+        </div>
+
+        <div class="program-actions">
+          <div class="small-badges">
+            <span class="badge">${user.role || ""}</span>
+            <span class="badge">pending</span>
+          </div>
+
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-primary btn-small" onclick='updateUserStatus("${user.id}", "active")'>
+              قبول
+            </button>
+            <button class="btn-secondary btn-small" onclick='updateUserStatus("${user.id}", "blocked")'>
+              رفض
+            </button>
+          </div>
+        </div>
+      `;
+
+      pendingContainer.appendChild(card);
+    });
   }
 
-  container.innerHTML = "";
+  if (!activeUsers.length) {
+    activeContainer.innerHTML = '<div class="empty">لا يوجد مستخدمون نشطون بعد</div>';
+  } else {
+    activeContainer.innerHTML = "";
+    activeUsers.forEach(user => {
+      const card = document.createElement("div");
+      card.className = "program-card";
 
-  data.forEach(user => {
-    const card = document.createElement("div");
-    card.className = "program-card";
+        if (!blockedUsers.length) {
+    blockedContainer.innerHTML = '<div class="empty">لا يوجد مستخدمون موقوفون</div>';
+  } else {
+    blockedContainer.innerHTML = "";
+    blockedUsers.forEach(user => {
+      const card = document.createElement("div");
+      card.className = "program-card";
 
-    let statusText = "بانتظار الموافقة";
-    if (user.status === "active") statusText = "نشط";
-    if (user.status === "blocked") statusText = "موقوف";
-
-    card.innerHTML = `
-      <h3>${user.full_name}</h3>
-      <div class="program-meta">
-        <div><strong>البريد:</strong> ${user.email}</div>
-        <div><strong>الدور:</strong> ${user.role}</div>
-        <div><strong>الحالة:</strong> ${statusText}</div>
-      </div>
-
-      <div class="program-actions">
-        <div class="small-badges">
-          <span class="badge">${user.role}</span>
-          <span class="badge">${user.status}</span>
+      card.innerHTML = `
+        <h3>${user.name || ""}</h3>
+        <div class="program-meta">
+          <div><strong>البريد:</strong> ${user.email || ""}</div>
+          <div><strong>الدور:</strong> ${user.role || ""}</div>
+          <div><strong>الحالة:</strong> موقوف</div>
         </div>
 
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn-primary btn-small" onclick='updateUserStatus("${user.id}", "active")'>
-            قبول
-          </button>
-          <button class="btn-secondary btn-small" onclick='updateUserStatus("${user.id}", "blocked")'>
-            إيقاف
-          </button>
-        </div>
-      </div>
-    `;
+        <div class="program-actions">
+          <div class="small-badges">
+            <span class="badge">${user.role || ""}</span>
+            <span class="badge">blocked</span>
+          </div>
 
-    container.appendChild(card);
-  });
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-primary btn-small" onclick='updateUserStatus("${user.id}", "active")'>
+              إعادة تفعيل
+            </button>
+          </div>
+        </div>
+      `;
+
+      blockedContainer.appendChild(card);
+    });
+  }
+
+      card.innerHTML = `
+        <h3>${user.name || ""}</h3>
+        <div class="program-meta">
+          <div><strong>البريد:</strong> ${user.email || ""}</div>
+          <div><strong>الدور:</strong> ${user.role || ""}</div>
+          <div><strong>الحالة:</strong> نشط</div>
+        </div>
+
+        <div class="program-actions">
+          <div class="small-badges">
+            <span class="badge">${user.role || ""}</span>
+            <span class="badge">active</span>
+          </div>
+
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-secondary btn-small" onclick='updateUserStatus("${user.id}", "blocked")'>
+              إيقاف
+            </button>
+          </div>
+        </div>
+      `;
+
+      activeContainer.appendChild(card);
+    });
+  }
 }
-
 async function updateUserStatus(userId, newStatus) {
   const { error } = await supabaseClient
     .from("users")
