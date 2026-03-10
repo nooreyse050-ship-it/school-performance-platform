@@ -1073,7 +1073,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 
   document.getElementById("loginForm").reset();
-  await applyLoggedInRole();
+  applyRoleView();
   await refreshAll();
 });
 
