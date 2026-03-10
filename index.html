@@ -293,13 +293,13 @@
   <div id="activeUsersList" class="program-cards"></div>
     </section>
 
-    <section class="section" id="blockedUsersSection">
+<section class="section" id="blockedUsersSection">
   <h2>المستخدمون الموقوفون</h2>
   <div id="blockedUsersList" class="program-cards"></div>
 </section>
     
-    <section class="section">
-      <h2>إضافة برنامج في الخطة التشغيلية</h2>
+    <section class="section" id="programFormSection">
+  <h2>إضافة برنامج في الخطة التشغيلية</h2>
       <form id="programForm">
         <label>المجال</label>
         <select id="field" required>
@@ -849,22 +849,35 @@ async function updateUserStatus(userId, newStatus) {
   alert("تم تحديث حالة المستخدم بنجاح");
   await loadUsers();
 }
-    function applyRoleView() {
+function applyRoleView() {
   const role = document.getElementById("currentRole")?.value || "معلمة";
 
+  const programFormSection = document.getElementById("programFormSection");
   const adminUsersSection = document.getElementById("adminUsersSection");
-  const programFormSection = document.getElementById("programForm")?.closest(".section");
+  const activeUsersSection = document.getElementById("activeUsersSection");
+  const blockedUsersSection = document.getElementById("blockedUsersSection");
 
   if (role === "مديرة") {
+    if (programFormSection) programFormSection.style.display = "block";
     if (adminUsersSection) adminUsersSection.style.display = "block";
-    if (programFormSection) programFormSection.style.display = "block";
+    if (activeUsersSection) activeUsersSection.style.display = "block";
+    if (blockedUsersSection) blockedUsersSection.style.display = "block";
   } else if (role === "مساعد إداري") {
-    if (adminUsersSection) adminUsersSection.style.display = "none";
-    if (programFormSection) programFormSection.style.display = "block";
-  } else {
-    if (adminUsersSection) adminUsersSection.style.display = "none";
     if (programFormSection) programFormSection.style.display = "none";
+    if (adminUsersSection) adminUsersSection.style.display = "none";
+    if (activeUsersSection) activeUsersSection.style.display = "none";
+    if (blockedUsersSection) blockedUsersSection.style.display = "none";
+  } else {
+    if (programFormSection) programFormSection.style.display = "none";
+    if (adminUsersSection) adminUsersSection.style.display = "none";
+    if (activeUsersSection) activeUsersSection.style.display = "none";
+    if (blockedUsersSection) blockedUsersSection.style.display = "none";
   }
+
+  const addProgramButtons = document.querySelectorAll(".admin-only");
+  addProgramButtons.forEach(el => {
+    el.style.display = role === "مديرة" ? "block" : "none";
+  });
 }
 
 document.addEventListener("change", function(e) {
