@@ -596,14 +596,13 @@ data.forEach(program => {
         return;
       }
 
-      list.className = "";
-      list.innerHTML = data.map(item => `
-        <div style="padding:12px;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:10px;">
-          <strong>${item.file_name || item.title || "شاهد"}</strong><br>
-          <span class="muted">${item.uploaded_by || ""}</span><br>
-          <a href="${item.file_url}" target="_blank">فتح الشاهد</a>
-        </div>
-      `).join("");
+    list.innerHTML = data.map(item => `
+  <div style="padding:12px;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:10px;">
+    <strong>${item.file_name || item.title || "شاهد"}</strong><br>
+    <span class="muted">رفع بواسطة: ${item.uploaded_by || "غير محدد"}</span><br>
+    <a href="${item.file_url}" target="_blank">فتح الشاهد</a>
+  </div>
+`).join("");
     }
 
     document.getElementById("evidenceForm").addEventListener("submit", async (e) => {
