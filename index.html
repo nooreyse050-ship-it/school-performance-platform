@@ -491,7 +491,7 @@ data.forEach(program => {
   const card = document.createElement("div");
   card.className = "program-card";
 
-  card.innerHTML = `
+  card.innerHTML = 
     <h3>${program.program_name || ""}</h3>
     <div class="program-meta">
       <div><strong>المجال:</strong> ${program.field || ""}</div>
@@ -511,7 +511,7 @@ data.forEach(program => {
         رفع شاهد
       </button>
     </div>
-  `;
+  ;
 
   container.appendChild(card);
 });
