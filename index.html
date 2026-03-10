@@ -683,14 +683,13 @@ data.forEach(program => {
       await refreshAll();
     });
 
-  async function refreshAll() {
+async function refreshAll() {
   await loadEvidenceCounts();
   await loadPrograms();
   await loadSwot();
   await loadUsers();
   await applyLoggedInRole();
 }
-
     window.onclick = function(event) {
       const modal = document.getElementById("evidenceModal");
       if (event.target === modal) closeEvidenceModal();
@@ -887,7 +886,7 @@ function applyRoleView() {
   }
 }
 });f (blockedUsersSection) blockedUsersSection.style.display = "none";
-  } e
+  } 
     let currentUserRole = null;
 let currentUserEmail = null;
 
@@ -944,6 +943,106 @@ async function applyLoggedInRole() {
   if (roleData.status === "blocked") {
     currentUserRole = null;
     if (loginStatus) loginStatus.textContent = "هذا الحساب موقوف، راجعي الإدارة";
+    return;
+  }
+
+  currentUserRole = roleData.role;
+
+  if (logoutBtn) logoutBtn.style.display = "inline-block";
+  if (loginStatus) loginStatus.textContent = `مرحبًا ${roleData.name || ""} | الدور: ${roleData.role}`;
+
+  applyRoleView();
+}
+
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+  const loginStatus = document.getElementById("loginStatus");
+
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    loginStatus.textContent = "فشل تسجيل الدخول";
+    console.log(error);
+    return;
+  }
+
+  document.getElementById("loginForm").reset();
+  await applyLoggedInRole();
+  await refreshAll();
+});
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await supabaseClient.auth.signOut();
+  currentUserRole = null;
+  currentUserEmail = null;
+  document.getElementById("logoutBtn").style.display = "none";
+  document.getElementById("loginStatus").textContent = "تم تسجيل الخروج";
+  applyRoleView();
+});
+    let currentUserRole = null;
+let currentUserEmail = null;
+
+async function getUserRole(email) {
+  const { data, error } = await supabaseClient
+    .from("users")
+    .select("*")
+    .eq("email", email)
+    .single();
+
+  if (error || !data) {
+    console.log("user role error", error);
+    return null;
+  }
+
+  return {
+    role: data.role,
+    status: data.status,
+    name: data.name || ""
+  };
+}
+
+async function applyLoggedInRole() {
+  const logoutBtn = document.getElementById("logoutBtn");
+  const loginStatus = document.getElementById("loginStatus");
+
+  const { data: authData } = await supabaseClient.auth.getUser();
+  const user = authData?.user;
+
+  if (!user) {
+    currentUserRole = null;
+    currentUserEmail = null;
+    if (logoutBtn) logoutBtn.style.display = "none";
+    if (loginStatus) loginStatus.textContent = "لم يتم تسجيل الدخول بعد";
+    applyRoleView();
+    return;
+  }
+
+  currentUserEmail = user.email;
+
+  const roleData = await getUserRole(user.email);
+
+  if (!roleData) {
+    if (loginStatus) loginStatus.textContent = "تم تسجيل الدخول، لكن لا يوجد سجل مستخدم مرتبط بهذا البريد";
+    return;
+  }
+
+  if (roleData.status === "pending") {
+    currentUserRole = null;
+    if (loginStatus) loginStatus.textContent = "طلبك ما زال بانتظار موافقة الإدارة";
+    applyRoleView();
+    return;
+  }
+
+  if (roleData.status === "blocked") {
+    currentUserRole = null;
+    if (loginStatus) loginStatus.textContent = "هذا الحساب موقوف";
+    applyRoleView();
     return;
   }
 
