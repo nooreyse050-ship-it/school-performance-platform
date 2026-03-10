@@ -688,7 +688,7 @@ async function refreshAll() {
   await loadPrograms();
   await loadSwot();
   await loadUsers();
-  await applyLoggedInRole();
+  applyRoleView();
 }
     window.onclick = function(event) {
       const modal = document.getElementById("evidenceModal");
