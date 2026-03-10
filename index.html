@@ -886,10 +886,10 @@ function applyRoleView() {
   }
 }
 });f (blockedUsersSection) blockedUsersSection.style.display = "none";
-  } 
+  
     let currentUserRole = null;
 let currentUserEmail = null;
-
+    }
 async function getUserRole(email) {
   const { data, error } = await supabaseClient
     .from("users")
