@@ -973,7 +973,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 
   document.getElementById("loginForm").reset();
-  await applyLoggedInRole();
+  applyLoggedInRole();
   await refreshAll();
 });
 
@@ -985,7 +985,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
   document.getElementById("loginStatus").textContent = "تم تسجيل الخروج";
   applyRoleView();
 });
-    let currentUserRole = null;
+  let currentUserRole = "مديرة";
 let currentUserEmail = null;
 
 async function getUserRole(email) {
