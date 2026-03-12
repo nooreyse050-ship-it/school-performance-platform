@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -18,9 +17,12 @@
       --green-soft: #e3f0e6;
       --green-border: #d8e8db;
       --danger: #b91c1c;
+      --danger-soft: #fee2e2;
       --danger-dark: #991b1b;
-      --yellow-bg: #fef3c7;
-      --yellow-text: #92400e;
+      --success: #166534;
+      --success-soft: #dcfce7;
+      --warning-soft: #fef3c7;
+      --warning-text: #92400e;
       --done-bg: #dcfce7;
       --done-text: #166534;
       --late-bg: #fee2e2;
@@ -92,7 +94,6 @@
       gap: 14px;
     }
 
-    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
     .grid-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
     .grid-4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
 
@@ -285,7 +286,7 @@
       font-weight: bold;
     }
 
-    .status-running { background: var(--yellow-bg); color: var(--yellow-text); }
+    .status-running { background: var(--warning-soft); color: var(--warning-text); }
     .status-done { background: var(--done-bg); color: var(--done-text); }
     .status-late { background: var(--late-bg); color: var(--late-text); }
 
@@ -440,6 +441,30 @@
       word-break: break-word;
     }
 
+    .message-box {
+      display: none;
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      line-height: 1.8;
+      font-size: 14px;
+      border: 1px solid transparent;
+    }
+
+    .message-box.error {
+      display: block;
+      background: var(--danger-soft);
+      color: var(--danger-dark);
+      border-color: #fecaca;
+    }
+
+    .message-box.success {
+      display: block;
+      background: var(--success-soft);
+      color: var(--success);
+      border-color: #bbf7d0;
+    }
+
     @media (max-width: 768px) {
       .container { padding: 14px; }
       .hero { padding: 20px; }
@@ -498,6 +523,8 @@
 
     <section class="section" id="authSection">
       <h2>تسجيل الدخول</h2>
+      <div id="globalMessage" class="message-box"></div>
+
       <form id="loginForm">
         <label>البريد الإلكتروني</label>
         <input id="loginEmail" type="email" placeholder="example@email.com" required />
@@ -753,6 +780,8 @@
         <button class="btn-secondary" type="button" onclick="closeEvidenceModal()">إغلاق</button>
       </div>
 
+      <div id="evidenceMessage" class="message-box"></div>
+
       <form id="evidenceForm">
         <input type="hidden" id="evidenceProgramId" />
 
@@ -797,6 +826,22 @@
     let cachedUsers = [];
     let cachedEvidence = [];
     let cachedSwot = [];
+
+    function showMessage(targetId, type, message) {
+      const box = document.getElementById(targetId);
+      if (!box) return;
+      box.className = `message-box ${type}`;
+      box.textContent = message;
+      box.style.display = "block";
+    }
+
+    function clearMessage(targetId) {
+      const box = document.getElementById(targetId);
+      if (!box) return;
+      box.className = "message-box";
+      box.textContent = "";
+      box.style.display = "none";
+    }
 
     function statusClass(status) {
       if (status === "منجز") return "status status-done";
@@ -935,28 +980,31 @@
     }
 
     function getSafeExtension(file) {
-      const typeMap = {
-        "application/pdf": ".pdf",
-        "image/png": ".png",
-        "image/jpeg": ".jpg",
-        "image/jpg": ".jpg",
-        "image/webp": ".webp"
+      const mimeMap = {
+        "application/pdf": "pdf",
+        "image/png": "png",
+        "image/jpeg": "jpg",
+        "image/jpg": "jpg",
+        "image/webp": "webp"
       };
 
-      if (typeMap[file.type]) return typeMap[file.type];
+      if (mimeMap[file.type]) return mimeMap[file.type];
 
-      const originalName = file.name || "";
-      const dotIndex = originalName.lastIndexOf(".");
-      if (dotIndex !== -1) return originalName.slice(dotIndex).toLowerCase();
+      const name = String(file.name || "");
+      const dot = name.lastIndexOf(".");
+      if (dot !== -1) {
+        const ext = name.slice(dot + 1).toLowerCase().replace(/[^a-z0-9]/g, "");
+        if (ext) return ext;
+      }
 
-      return ".bin";
+      return "bin";
     }
 
     function buildSafeStoragePath(programId, file) {
-      const cleanProgramId = String(programId).trim().replace(/[^a-zA-Z0-9-]/g, "");
+      const cleanProgramId = String(programId).replace(/[^a-zA-Z0-9-]/g, "");
       const ext = getSafeExtension(file);
       const randomPart = Math.random().toString(36).slice(2, 10);
-      return `${cleanProgramId}/${Date.now()}-${randomPart}${ext}`;
+      return `${cleanProgramId}/${Date.now()}_${randomPart}.${ext}`;
     }
 
     function isAllowedFileType(file) {
@@ -1371,18 +1419,20 @@
     }
 
     async function updateUserStatus(userId, newStatus) {
+      clearMessage("globalMessage");
+
       const { error } = await supabaseClient
         .from("users")
         .update({ status: newStatus })
         .eq("id", userId);
 
       if (error) {
-        alert("حدث خطأ أثناء تحديث حالة المستخدم");
         console.log(error);
+        showMessage("globalMessage", "error", "حدث خطأ أثناء تحديث حالة المستخدم");
         return;
       }
 
-      alert("تم تحديث حالة المستخدم بنجاح");
+      showMessage("globalMessage", "success", "تم تحديث حالة المستخدم بنجاح");
       await loadUsers();
       await applyLoggedInRole();
     }
@@ -1412,6 +1462,7 @@
     }
 
     async function deleteProgram(programId) {
+      clearMessage("globalMessage");
       const confirmed = confirm("هل أنت متأكدة من حذف البرنامج؟ سيتم حذف بياناته وشواهده المرتبطة نهائيًا.");
       if (!confirmed) return;
 
@@ -1421,12 +1472,12 @@
         .eq("id", programId);
 
       if (error) {
-        alert("حدث خطأ أثناء حذف البرنامج");
         console.log(error);
+        showMessage("globalMessage", "error", "حدث خطأ أثناء حذف البرنامج");
         return;
       }
 
-      alert("تم حذف البرنامج بنجاح");
+      showMessage("globalMessage", "success", "تم حذف البرنامج بنجاح");
       await refreshAll();
     }
 
@@ -1448,6 +1499,7 @@
     }
 
     async function deleteSwot(swotId) {
+      clearMessage("globalMessage");
       const confirmed = confirm("هل أنت متأكدة من حذف هذا العنصر من SWOT؟");
       if (!confirmed) return;
 
@@ -1457,12 +1509,12 @@
         .eq("id", swotId);
 
       if (error) {
-        alert("حدث خطأ أثناء حذف عنصر SWOT");
         console.log(error);
+        showMessage("globalMessage", "error", "حدث خطأ أثناء حذف عنصر SWOT");
         return;
       }
 
-      alert("تم حذف عنصر SWOT بنجاح");
+      showMessage("globalMessage", "success", "تم حذف عنصر SWOT بنجاح");
       await loadSwot();
     }
 
@@ -1471,14 +1523,17 @@
       document.getElementById("evidenceModalTitle").textContent = "رفع شاهد - " + (programName || "");
       document.getElementById("evidenceModal").style.display = "block";
       document.getElementById("evidenceForm").reset();
+      clearMessage("evidenceMessage");
       loadEvidenceForProgram(programId);
     }
 
     function closeEvidenceModal() {
       document.getElementById("evidenceModal").style.display = "none";
+      clearMessage("evidenceMessage");
     }
 
     async function deleteEvidence(evidenceId) {
+      clearMessage("evidenceMessage");
       const confirmed = confirm("هل أنت متأكدة من حذف هذا الشاهد؟");
       if (!confirmed) return;
 
@@ -1488,8 +1543,8 @@
         .eq("id", evidenceId);
 
       if (error) {
-        alert("حدث خطأ أثناء حذف الشاهد");
         console.log(error);
+        showMessage("evidenceMessage", "error", "حدث خطأ أثناء حذف الشاهد");
         return;
       }
 
@@ -1497,7 +1552,7 @@
       await loadEvidenceCounts();
       await loadEvidenceForProgram(programId);
       await loadPrograms();
-      alert("تم حذف الشاهد بنجاح");
+      showMessage("evidenceMessage", "success", "تم حذف الشاهد بنجاح");
     }
 
     async function loadEvidenceForProgram(programId) {
@@ -1551,6 +1606,7 @@
 
     document.getElementById("programForm").addEventListener("submit", async (e) => {
       e.preventDefault();
+      clearMessage("globalMessage");
 
       const editingId = document.getElementById("editingProgramId").value;
 
@@ -1567,19 +1623,19 @@
       if (editingId) {
         const { error } = await supabaseClient.from("programs").update(payload).eq("id", editingId);
         if (error) {
-          alert("حدث خطأ أثناء تعديل البرنامج");
           console.log(error);
+          showMessage("globalMessage", "error", "حدث خطأ أثناء تعديل البرنامج");
           return;
         }
-        alert("تم تعديل البرنامج بنجاح");
+        showMessage("globalMessage", "success", "تم تعديل البرنامج بنجاح");
       } else {
         const { error } = await supabaseClient.from("programs").insert([payload]);
         if (error) {
-          alert("حدث خطأ أثناء حفظ البرنامج");
           console.log(error);
+          showMessage("globalMessage", "error", "حدث خطأ أثناء حفظ البرنامج");
           return;
         }
-        alert("تم حفظ البرنامج بنجاح");
+        showMessage("globalMessage", "success", "تم حفظ البرنامج بنجاح");
       }
 
       resetProgramForm();
@@ -1588,6 +1644,7 @@
 
     document.getElementById("swotForm").addEventListener("submit", async (e) => {
       e.preventDefault();
+      clearMessage("globalMessage");
 
       const editingId = document.getElementById("editingSwotId").value;
       const payload = {
@@ -1598,19 +1655,19 @@
       if (editingId) {
         const { error } = await supabaseClient.from("swot").update(payload).eq("id", editingId);
         if (error) {
-          alert("حدث خطأ أثناء تعديل عنصر SWOT");
           console.log(error);
+          showMessage("globalMessage", "error", "حدث خطأ أثناء تعديل عنصر SWOT");
           return;
         }
-        alert("تم تعديل عنصر SWOT بنجاح");
+        showMessage("globalMessage", "success", "تم تعديل عنصر SWOT بنجاح");
       } else {
         const { error } = await supabaseClient.from("swot").insert([payload]);
         if (error) {
-          alert("حدث خطأ أثناء حفظ عنصر SWOT");
           console.log(error);
+          showMessage("globalMessage", "error", "حدث خطأ أثناء حفظ عنصر SWOT");
           return;
         }
-        alert("تم حفظ عنصر SWOT بنجاح");
+        showMessage("globalMessage", "success", "تم حفظ عنصر SWOT بنجاح");
       }
 
       resetSwotForm();
@@ -1619,6 +1676,7 @@
 
     document.getElementById("evidenceForm").addEventListener("submit", async (e) => {
       e.preventDefault();
+      clearMessage("evidenceMessage");
 
       const programId = document.getElementById("evidenceProgramId").value;
       const uploaderName = document.getElementById("uploaderName").value.trim();
@@ -1627,18 +1685,18 @@
       const file = document.getElementById("evidenceFile").files[0];
 
       if (!file) {
-        alert("يرجى اختيار ملف أو صورة");
+        showMessage("evidenceMessage", "error", "يرجى اختيار ملف أو صورة");
         return;
       }
 
       if (!isAllowedFileType(file)) {
-        alert("الملف غير مدعوم. المسموح: PDF أو PNG أو JPG أو WEBP");
+        showMessage("evidenceMessage", "error", "الملف غير مدعوم. المسموح: PDF أو PNG أو JPG أو WEBP");
         return;
       }
 
       const maxSizeMB = 10;
       if (file.size > maxSizeMB * 1024 * 1024) {
-        alert("حجم الملف كبير جدًا. الحد الأقصى 10MB");
+        showMessage("evidenceMessage", "error", "حجم الملف كبير جدًا. الحد الأقصى 10MB");
         return;
       }
 
@@ -1654,7 +1712,7 @@
 
       if (uploadResult.error) {
         console.log("upload error:", uploadResult.error);
-        alert(`تعذر رفع الملف: ${uploadResult.error.message || "خطأ غير معروف"}`);
+        showMessage("evidenceMessage", "error", `تعذر رفع الملف: ${uploadResult.error.message || "خطأ غير معروف"}`);
         return;
       }
 
@@ -1665,7 +1723,7 @@
       const publicUrl = publicUrlData?.data?.publicUrl || "";
 
       if (!publicUrl) {
-        alert("تم رفع الملف لكن تعذر إنشاء رابط العرض");
+        showMessage("evidenceMessage", "error", "تم رفع الملف لكن تعذر إنشاء رابط العرض");
         return;
       }
 
@@ -1680,19 +1738,20 @@
 
       if (error) {
         console.log("insert error:", error);
-        alert(`تم رفع الملف لكن تعذر حفظ السجل: ${error.message || "خطأ غير معروف"}`);
+        showMessage("evidenceMessage", "error", `تم رفع الملف لكن تعذر حفظ السجل: ${error.message || "خطأ غير معروف"}`);
         return;
       }
 
-      alert("تم حفظ الشاهد بنجاح");
       document.getElementById("evidenceForm").reset();
       await loadEvidenceCounts();
       await loadEvidenceForProgram(programId);
       await loadPrograms();
+      showMessage("evidenceMessage", "success", "تم حفظ الشاهد بنجاح");
     });
 
     document.getElementById("registerForm").addEventListener("submit", async (e) => {
       e.preventDefault();
+      clearMessage("globalMessage");
 
       const payload = {
         name: document.getElementById("register_name").value,
@@ -1704,18 +1763,19 @@
       const { error } = await supabaseClient.from("users").insert([payload]);
 
       if (error) {
-        alert("حدث خطأ أثناء إرسال طلب التسجيل");
         console.log(error);
+        showMessage("globalMessage", "error", "حدث خطأ أثناء إرسال طلب التسجيل");
         return;
       }
 
-      alert("تم إرسال طلب التسجيل بنجاح، وبانتظار اعتماد الإدارة");
       document.getElementById("registerForm").reset();
+      showMessage("globalMessage", "success", "تم إرسال طلب التسجيل بنجاح، وبانتظار اعتماد الإدارة");
       await loadUsers();
     });
 
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
+      clearMessage("globalMessage");
 
       const email = document.getElementById("loginEmail").value;
       const password = document.getElementById("loginPassword").value;
@@ -1724,23 +1784,27 @@
       const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
       if (error) {
-        loginStatus.textContent = "فشل تسجيل الدخول";
         console.log(error);
+        loginStatus.textContent = "فشل تسجيل الدخول";
+        showMessage("globalMessage", "error", "فشل تسجيل الدخول، تأكدي من البريد وكلمة المرور");
         return;
       }
 
       document.getElementById("loginForm").reset();
       await applyLoggedInRole();
       await refreshAll();
+      showMessage("globalMessage", "success", "تم تسجيل الدخول بنجاح");
     });
 
     document.getElementById("logoutBtn").addEventListener("click", async () => {
+      clearMessage("globalMessage");
       await supabaseClient.auth.signOut();
       currentUserRole = null;
       currentUserEmail = null;
       document.getElementById("logoutBtn").style.display = "none";
       document.getElementById("loginStatus").textContent = "تم تسجيل الخروج";
       applyRoleView();
+      showMessage("globalMessage", "success", "تم تسجيل الخروج");
       await refreshAll();
     });
 
