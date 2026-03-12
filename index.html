@@ -786,725 +786,424 @@
       </div>
     </div>
   </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const supabaseUrl = "https://uekovggqcsnbwpnbibjz.supabase.co";
+  const supabaseKey = "sb_publishable_i0vQ90zclZwHaSFCzHOOfw_Gsfkld9f";
+  const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const supabaseUrl = "https://uekovggqcsnbwpnbibjz.supabase.co";
-    const supabaseKey = "sb_publishable_i0vQ90zclZwHaSFCzHOOfw_Gsfkld9f";
-    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+  let evidenceCounts = {};
+  let currentUserRole = null;
+  let currentUserEmail = null;
+  let cachedPrograms = [];
+  let cachedUsers = [];
+  let cachedEvidence = [];
+  let cachedSwot = [];
 
-    let evidenceCounts = {};
-    let currentUserRole = null;
-    let currentUserEmail = null;
-    let cachedPrograms = [];
-    let cachedUsers = [];
-    let cachedEvidence = [];
-    let cachedSwot = [];
+  function statusClass(status) {
+    if (status === "منجز") return "status status-done";
+    if (status === "متأخر") return "status status-late";
+    return "status status-running";
+  }
 
-    function statusClass(status) {
-      if (status === "منجز") return "status status-done";
-      if (status === "متأخر") return "status status-late";
-      return "status status-running";
+  function escapeHtml(text) {
+    if (text === null || text === undefined) return "";
+    return String(text)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function scrollToSection(sectionId) {
+    const el = document.getElementById(sectionId);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function canManageUsers() {
+    return currentUserRole === "مديرة المدرسة";
+  }
+
+  function canDeletePrograms() {
+    return currentUserRole === "مديرة المدرسة";
+  }
+
+  function canEditPrograms() {
+    return ["مديرة المدرسة", "وكيلة", "موجهة طلابية", "مساعد إداري"].includes(currentUserRole);
+  }
+
+  function canEditSwot() {
+    return ["مديرة المدرسة", "وكيلة"].includes(currentUserRole);
+  }
+
+  function canDeleteSwot() {
+    return currentUserRole === "مديرة المدرسة";
+  }
+
+  function canDeleteEvidence() {
+    return ["مديرة المدرسة", "وكيلة"].includes(currentUserRole);
+  }
+
+  function applyRoleView() {
+    const role = currentUserRole;
+
+    const programFormSection = document.getElementById("programFormSection");
+    const adminUsersSection = document.getElementById("adminUsersSection");
+    const activeUsersSection = document.getElementById("activeUsersSection");
+    const blockedUsersSection = document.getElementById("blockedUsersSection");
+    const swotFormSection = document.getElementById("swotFormSection");
+
+    const canSeeProgramForm = ["مديرة المدرسة", "وكيلة", "موجهة طلابية", "مساعد إداري"].includes(role);
+    const canSeeSwotForm = ["مديرة المدرسة", "وكيلة"].includes(role);
+
+    if (programFormSection) programFormSection.style.display = canSeeProgramForm ? "block" : "none";
+    if (swotFormSection) swotFormSection.style.display = canSeeSwotForm ? "block" : "none";
+
+    if (adminUsersSection) adminUsersSection.style.display = canManageUsers() ? "block" : "none";
+    if (activeUsersSection) activeUsersSection.style.display = canManageUsers() ? "block" : "none";
+    if (blockedUsersSection) blockedUsersSection.style.display = canManageUsers() ? "block" : "none";
+  }
+
+  async function getUserRole(email) {
+    const { data, error } = await supabaseClient
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
+
+    if (error || !data) {
+      console.log("user role error", error);
+      return null;
     }
 
-    function escapeHtml(text) {
-      if (text === null || text === undefined) return "";
-      return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
+    return {
+      role: data.role,
+      status: data.status,
+      name: data.name || data.full_name || ""
+    };
+  }
 
-    function scrollToSection(sectionId) {
-      const el = document.getElementById(sectionId);
-      if (!el) return;
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+  async function applyLoggedInRole() {
+    const logoutBtn = document.getElementById("logoutBtn");
+    const loginStatus = document.getElementById("loginStatus");
 
-    function canManageUsers() {
-      return currentUserRole === "مديرة المدرسة";
-    }
+    const { data: authData, error } = await supabaseClient.auth.getUser();
+    const user = authData?.user;
 
-    function canDeletePrograms() {
-      return currentUserRole === "مديرة المدرسة";
-    }
+    if (error) console.log("auth getUser error", error);
 
-    function canEditPrograms() {
-      return ["مديرة المدرسة", "وكيلة", "موجهة طلابية", "مساعد إداري"].includes(currentUserRole);
-    }
-
-    function canAddSwot() {
-      return ["مديرة المدرسة", "وكيلة"].includes(currentUserRole);
-    }
-
-    function canEditSwot() {
-      return ["مديرة المدرسة", "وكيلة"].includes(currentUserRole);
-    }
-
-    function canDeleteSwot() {
-      return currentUserRole === "مديرة المدرسة";
-    }
-
-    function canDeleteEvidence() {
-      return ["مديرة المدرسة", "وكيلة"].includes(currentUserRole);
-    }
-
-    function applyRoleView() {
-      const role = currentUserRole;
-
-      const programFormSection = document.getElementById("programFormSection");
-      const adminUsersSection = document.getElementById("adminUsersSection");
-      const activeUsersSection = document.getElementById("activeUsersSection");
-      const blockedUsersSection = document.getElementById("blockedUsersSection");
-      const swotFormSection = document.getElementById("swotFormSection");
-
-      const canSeeProgramForm = ["مديرة المدرسة", "وكيلة", "موجهة طلابية", "مساعد إداري"].includes(role);
-      const canSeeSwotForm = ["مديرة المدرسة", "وكيلة"].includes(role);
-
-      if (programFormSection) programFormSection.style.display = canSeeProgramForm ? "block" : "none";
-      if (swotFormSection) swotFormSection.style.display = canSeeSwotForm ? "block" : "none";
-
-      if (adminUsersSection) adminUsersSection.style.display = canManageUsers() ? "block" : "none";
-      if (activeUsersSection) activeUsersSection.style.display = canManageUsers() ? "block" : "none";
-      if (blockedUsersSection) blockedUsersSection.style.display = canManageUsers() ? "block" : "none";
-    }
-
-    async function getUserRole(email) {
-      const { data, error } = await supabaseClient
-        .from("users")
-        .select("*")
-        .eq("email", email)
-        .single();
-
-      if (error || !data) {
-        console.log("user role error", error);
-        return null;
-      }
-
-      return {
-        role: data.role,
-        status: data.status,
-        name: data.name || data.full_name || ""
-      };
-    }
-
-    async function applyLoggedInRole() {
-      const logoutBtn = document.getElementById("logoutBtn");
-      const loginStatus = document.getElementById("loginStatus");
-
-      const { data: authData, error } = await supabaseClient.auth.getUser();
-      const user = authData?.user;
-
-      if (error) {
-        console.log("auth getUser error", error);
-      }
-
-      if (!user) {
-        currentUserRole = null;
-        currentUserEmail = null;
-        if (logoutBtn) logoutBtn.style.display = "none";
-        if (loginStatus) loginStatus.textContent = "لم يتم تسجيل الدخول بعد";
-        applyRoleView();
-        return;
-      }
-
-      currentUserEmail = user.email;
-      const roleData = await getUserRole(user.email);
-
-      if (!roleData) {
-        currentUserRole = null;
-        if (logoutBtn) logoutBtn.style.display = "inline-block";
-        if (loginStatus) loginStatus.textContent = "تم تسجيل الدخول، لكن لا يوجد سجل مستخدم مرتبط بهذا البريد";
-        applyRoleView();
-        return;
-      }
-
-      if (roleData.status === "pending") {
-        currentUserRole = null;
-        if (logoutBtn) logoutBtn.style.display = "inline-block";
-        if (loginStatus) loginStatus.textContent = "طلبك ما زال بانتظار موافقة الإدارة";
-        applyRoleView();
-        return;
-      }
-
-      if (roleData.status === "blocked") {
-        currentUserRole = null;
-        if (logoutBtn) logoutBtn.style.display = "inline-block";
-        if (loginStatus) loginStatus.textContent = "هذا الحساب موقوف، راجعي الإدارة";
-        applyRoleView();
-        return;
-      }
-
-      currentUserRole = roleData.role;
-      if (logoutBtn) logoutBtn.style.display = "inline-block";
-      if (loginStatus) loginStatus.textContent = `مرحبًا ${roleData.name || ""} | الدور: ${roleData.role}`;
+    if (!user) {
+      currentUserRole = null;
+      currentUserEmail = null;
+      if (logoutBtn) logoutBtn.style.display = "none";
+      if (loginStatus) loginStatus.textContent = "لم يتم تسجيل الدخول بعد";
       applyRoleView();
+      return;
     }
 
-    function renderFieldIndicators(programs) {
-      const container = document.getElementById("fieldIndicatorsContainer");
-      if (!container) return;
+    currentUserEmail = user.email;
+    const roleData = await getUserRole(user.email);
 
-      const fixedFields = [
-        "القيادة والإدارة المدرسية",
-        "التعليم والتعلم",
-        "نواتج التعلم",
-        "البيئة المدرسية",
-        "الشراكة المجتمعية"
-      ];
+    if (!roleData) {
+      currentUserRole = null;
+      if (logoutBtn) logoutBtn.style.display = "inline-block";
+      if (loginStatus) loginStatus.textContent = "تم تسجيل الدخول، لكن لا يوجد سجل مستخدم مرتبط بهذا البريد";
+      applyRoleView();
+      return;
+    }
 
-      const stats = {};
-      fixedFields.forEach(field => {
-        stats[field] = { total: 0, sum: 0 };
-      });
+    if (roleData.status === "pending") {
+      currentUserRole = null;
+      if (logoutBtn) logoutBtn.style.display = "inline-block";
+      if (loginStatus) loginStatus.textContent = "طلبك ما زال بانتظار موافقة الإدارة";
+      applyRoleView();
+      return;
+    }
 
-      programs.forEach(program => {
-        const field = program.field || "غير محدد";
-        if (!stats[field]) stats[field] = { total: 0, sum: 0 };
-        stats[field].total += 1;
-        stats[field].sum += Number(program.progress || 0);
-      });
+    if (roleData.status === "blocked") {
+      currentUserRole = null;
+      if (logoutBtn) logoutBtn.style.display = "inline-block";
+      if (loginStatus) loginStatus.textContent = "هذا الحساب موقوف، راجعي الإدارة";
+      applyRoleView();
+      return;
+    }
 
-      const rows = Object.entries(stats)
-        .filter(([_, value]) => value.total > 0)
-        .map(([field, value]) => {
-          const avg = Math.round(value.sum / value.total);
-          return `
-            <div class="progress-row">
-              <div class="progress-percent">${avg}%</div>
-              <div>
-                <div class="progress-track">
-                  <div class="progress-fill" style="width:${avg}%"></div>
-                </div>
+    currentUserRole = roleData.role;
+    if (logoutBtn) logoutBtn.style.display = "inline-block";
+    if (loginStatus) loginStatus.textContent = `مرحبًا ${roleData.name || ""} | الدور: ${roleData.role}`;
+    applyRoleView();
+  }
+
+  function sanitizeFileName(fileName) {
+    const dotIndex = fileName.lastIndexOf(".");
+    const ext = dotIndex !== -1 ? fileName.slice(dotIndex).toLowerCase() : "";
+    const base = dotIndex !== -1 ? fileName.slice(0, dotIndex) : fileName;
+
+    const safeBase = base
+      .normalize("NFKD")
+      .replace(/[^\w\u0600-\u06FF-]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 80) || "file";
+
+    return `${safeBase}${ext}`;
+  }
+
+  function isAllowedFileType(file) {
+    const allowed = [
+      "application/pdf",
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/webp"
+    ];
+    return allowed.includes(file.type);
+  }
+
+  function renderFieldIndicators(programs) {
+    const container = document.getElementById("fieldIndicatorsContainer");
+    if (!container) return;
+
+    const fixedFields = [
+      "القيادة والإدارة المدرسية",
+      "التعليم والتعلم",
+      "نواتج التعلم",
+      "البيئة المدرسية",
+      "الشراكة المجتمعية"
+    ];
+
+    const stats = {};
+    fixedFields.forEach(field => {
+      stats[field] = { total: 0, sum: 0 };
+    });
+
+    programs.forEach(program => {
+      const field = program.field || "غير محدد";
+      if (!stats[field]) stats[field] = { total: 0, sum: 0 };
+      stats[field].total += 1;
+      stats[field].sum += Number(program.progress || 0);
+    });
+
+    const rows = Object.entries(stats)
+      .filter(([_, value]) => value.total > 0)
+      .map(([field, value]) => {
+        const avg = Math.round(value.sum / value.total);
+        return `
+          <div class="progress-row">
+            <div class="progress-percent">${avg}%</div>
+            <div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:${avg}%"></div>
               </div>
-              <div class="progress-label">${escapeHtml(field)}</div>
             </div>
-          `;
-        });
-
-      if (!rows.length) {
-        container.innerHTML = `<div class="muted">لا توجد بيانات برامج لاحتساب مؤشرات المجالات.</div>`;
-        return;
-      }
-
-      container.innerHTML = rows.join("");
-    }
-
-    function updateLeadershipCards(programs, evidenceData, usersData) {
-      const totalPrograms = programs.length;
-      const totalEvidence = evidenceData.length;
-
-      let totalProgress = 0;
-      let advancedPrograms = 0;
-      let latePrograms = 0;
-      let donePrograms = 0;
-      let runningPrograms = 0;
-
-      programs.forEach(program => {
-        const progress = Number(program.progress || 0);
-        totalProgress += progress;
-
-        if (progress >= 75) advancedPrograms++;
-        if (program.status === "متأخر") latePrograms++;
-        if (program.status === "منجز") donePrograms++;
-        if (program.status === "قيد التنفيذ") runningPrograms++;
-      });
-
-      const avgProgress = totalPrograms ? Math.round(totalProgress / totalPrograms) : 0;
-      const evidenceCoverage = totalPrograms ? Math.min(100, Math.round((Object.keys(evidenceCounts).length / totalPrograms) * 100)) : 0;
-      const doneRate = totalPrograms ? Math.round((donePrograms / totalPrograms) * 100) : 0;
-      const visitReadiness = Math.round((avgProgress * 0.55) + (evidenceCoverage * 0.25) + (doneRate * 0.20));
-
-      document.getElementById("metricPlanCompletion").textContent = avgProgress + "%";
-      document.getElementById("metricAdvancedPrograms").textContent = advancedPrograms;
-      document.getElementById("metricLateProgramsTop").textContent = latePrograms;
-      document.getElementById("metricEvidenceTop").textContent = totalEvidence;
-      document.getElementById("metricVisitReadiness").textContent = Math.min(100, visitReadiness) + "%";
-      document.getElementById("metricTargetUsers").textContent = usersData.length || 0;
-
-      document.getElementById("metricPrograms").textContent = totalPrograms;
-      document.getElementById("metricProgress").textContent = avgProgress + "%";
-      document.getElementById("metricEvidenceBottom").textContent = totalEvidence;
-
-      document.getElementById("metricDonePrograms").textContent = donePrograms;
-      document.getElementById("metricRunningPrograms").textContent = runningPrograms;
-      document.getElementById("metricLatePrograms").textContent = latePrograms;
-      document.getElementById("metricTotalCompletion").textContent = avgProgress + "%";
-
-      renderFieldIndicators(programs);
-    }
-
-    async function loadEvidenceCounts() {
-      const { data, error } = await supabaseClient
-        .from("evidence")
-        .select("id, program_id, file_url, file_name, uploaded_by, created_at");
-
-      if (error) {
-        console.log("evidence count error", error);
-        evidenceCounts = {};
-        cachedEvidence = [];
-        return;
-      }
-
-      evidenceCounts = {};
-      cachedEvidence = data || [];
-
-      cachedEvidence.forEach(item => {
-        evidenceCounts[item.program_id] = (evidenceCounts[item.program_id] || 0) + 1;
-      });
-    }
-
-    function getFilteredPrograms() {
-      const search = (document.getElementById("programSearchInput")?.value || "").trim().toLowerCase();
-      const fieldFilter = document.getElementById("programFieldFilter")?.value || "";
-
-      return cachedPrograms.filter(program => {
-        const matchesField = !fieldFilter || program.field === fieldFilter;
-
-        const haystack = [
-          program.program_name,
-          program.indicator_name,
-          program.owner_role,
-          program.field,
-          program.status
-        ].join(" ").toLowerCase();
-
-        const matchesSearch = !search || haystack.includes(search);
-        return matchesField && matchesSearch;
-      });
-    }
-
-    function renderPrograms() {
-      const container = document.getElementById("programs");
-      const data = getFilteredPrograms();
-      container.innerHTML = "";
-
-      if (!data.length) {
-        container.innerHTML = '<div class="empty">لا توجد برامج مطابقة للبحث أو الفلترة</div>';
-        updateLeadershipCards(cachedPrograms, cachedEvidence, cachedUsers);
-        return;
-      }
-
-      let currentField = "";
-
-      data.forEach(program => {
-        if (program.field !== currentField) {
-          currentField = program.field;
-          const fieldTitle = document.createElement("h3");
-          fieldTitle.className = "field-title";
-          fieldTitle.textContent = currentField || "بدون مجال";
-          container.appendChild(fieldTitle);
-        }
-
-        const card = document.createElement("div");
-        card.className = "program-card";
-
-        card.innerHTML = `
-          <h3>${escapeHtml(program.program_name || "")}</h3>
-
-          <div class="program-meta">
-            <div><strong>المجال:</strong> ${escapeHtml(program.field || "")}</div>
-            <div><strong>المؤشر:</strong> ${escapeHtml(program.indicator_name || "غير محدد")}</div>
-            <div><strong>المسؤول:</strong> ${escapeHtml(program.owner_role || "مشترك")}</div>
-            <div><strong>تاريخ التنفيذ:</strong> ${escapeHtml(program.start_date || "غير محدد")}</div>
-          </div>
-
-          <div class="program-actions">
-            <div class="small-badges">
-              <span class="badge">${Number(program.progress || 0)}% إنجاز</span>
-              <span class="${statusClass(program.status)}">${escapeHtml(program.status || "قيد التنفيذ")}</span>
-              <span class="badge">الشواهد: ${evidenceCounts[program.id] || 0}</span>
-            </div>
-
-            <div class="inline-actions">
-              <button class="upload-evidence-btn btn-small" type="button"
-                onclick='openEvidenceModal(${JSON.stringify(program.id)}, ${JSON.stringify(program.program_name || "")})'>
-                رفع شاهد
-              </button>
-
-              ${
-                canEditPrograms()
-                  ? `<button class="btn-secondary btn-small" type="button" onclick='startEditProgram(${JSON.stringify(program.id)})'>تعديل</button>`
-                  : ""
-              }
-
-              ${
-                canDeletePrograms()
-                  ? `<button class="btn-danger btn-small" type="button" onclick='deleteProgram(${JSON.stringify(program.id)})'>حذف البرنامج</button>`
-                  : ""
-              }
-            </div>
+            <div class="progress-label">${escapeHtml(field)}</div>
           </div>
         `;
-
-        container.appendChild(card);
       });
 
-      updateLeadershipCards(cachedPrograms, cachedEvidence, cachedUsers);
+    if (!rows.length) {
+      container.innerHTML = `<div class="muted">لا توجد بيانات برامج لاحتساب مؤشرات المجالات.</div>`;
+      return;
     }
 
-    async function loadPrograms() {
-      const { data, error } = await supabaseClient
-        .from("programs")
-        .select("*")
-        .order("field", { ascending: true });
+    container.innerHTML = rows.join("");
+  }
 
-      if (error) {
-        console.log("programs error", error);
-        cachedPrograms = [];
-        document.getElementById("programs").innerHTML = '<div class="empty">تعذر تحميل البرامج</div>';
-        updateLeadershipCards([], cachedEvidence, cachedUsers);
-        return;
+  function updateLeadershipCards(programs, evidenceData, usersData) {
+    const totalPrograms = programs.length;
+    const totalEvidence = evidenceData.length;
+
+    let totalProgress = 0;
+    let advancedPrograms = 0;
+    let latePrograms = 0;
+    let donePrograms = 0;
+    let runningPrograms = 0;
+
+    programs.forEach(program => {
+      const progress = Number(program.progress || 0);
+      totalProgress += progress;
+
+      if (progress >= 75) advancedPrograms++;
+      if (program.status === "متأخر") latePrograms++;
+      if (program.status === "منجز") donePrograms++;
+      if (program.status === "قيد التنفيذ") runningPrograms++;
+    });
+
+    const avgProgress = totalPrograms ? Math.round(totalProgress / totalPrograms) : 0;
+    const evidenceCoverage = totalPrograms ? Math.min(100, Math.round((Object.keys(evidenceCounts).length / totalPrograms) * 100)) : 0;
+    const doneRate = totalPrograms ? Math.round((donePrograms / totalPrograms) * 100) : 0;
+    const visitReadiness = Math.round((avgProgress * 0.55) + (evidenceCoverage * 0.25) + (doneRate * 0.20));
+
+    document.getElementById("metricPlanCompletion").textContent = avgProgress + "%";
+    document.getElementById("metricAdvancedPrograms").textContent = advancedPrograms;
+    document.getElementById("metricLateProgramsTop").textContent = latePrograms;
+    document.getElementById("metricEvidenceTop").textContent = totalEvidence;
+    document.getElementById("metricVisitReadiness").textContent = Math.min(100, visitReadiness) + "%";
+    document.getElementById("metricTargetUsers").textContent = usersData.length || 0;
+
+    document.getElementById("metricPrograms").textContent = totalPrograms;
+    document.getElementById("metricProgress").textContent = avgProgress + "%";
+    document.getElementById("metricEvidenceBottom").textContent = totalEvidence;
+
+    document.getElementById("metricDonePrograms").textContent = donePrograms;
+    document.getElementById("metricRunningPrograms").textContent = runningPrograms;
+    document.getElementById("metricLatePrograms").textContent = latePrograms;
+    document.getElementById("metricTotalCompletion").textContent = avgProgress + "%";
+
+    renderFieldIndicators(programs);
+  }
+
+  async function loadEvidenceCounts() {
+    const { data, error } = await supabaseClient
+      .from("evidence")
+      .select("id, program_id, file_url, file_name, uploaded_by, created_at");
+
+    if (error) {
+      console.log("evidence count error", error);
+      evidenceCounts = {};
+      cachedEvidence = [];
+      return;
+    }
+
+    evidenceCounts = {};
+    cachedEvidence = data || [];
+
+    cachedEvidence.forEach(item => {
+      evidenceCounts[item.program_id] = (evidenceCounts[item.program_id] || 0) + 1;
+    });
+  }
+
+  function getFilteredPrograms() {
+    const search = (document.getElementById("programSearchInput")?.value || "").trim().toLowerCase();
+    const fieldFilter = document.getElementById("programFieldFilter")?.value || "";
+
+    return cachedPrograms.filter(program => {
+      const matchesField = !fieldFilter || program.field === fieldFilter;
+
+      const haystack = [
+        program.program_name,
+        program.indicator_name,
+        program.owner_role,
+        program.field,
+        program.status
+      ].join(" ").toLowerCase();
+
+      const matchesSearch = !search || haystack.includes(search);
+      return matchesField && matchesSearch;
+    });
+  }
+
+  function renderPrograms() {
+    const container = document.getElementById("programs");
+    const data = getFilteredPrograms();
+    container.innerHTML = "";
+
+    if (!data.length) {
+      container.innerHTML = '<div class="empty">لا توجد برامج مطابقة للبحث أو الفلترة</div>';
+      updateLeadershipCards(cachedPrograms, cachedEvidence, cachedUsers);
+      return;
+    }
+
+    let currentField = "";
+
+    data.forEach(program => {
+      if (program.field !== currentField) {
+        currentField = program.field;
+        const fieldTitle = document.createElement("h3");
+        fieldTitle.className = "field-title";
+        fieldTitle.textContent = currentField || "بدون مجال";
+        container.appendChild(fieldTitle);
       }
 
-      cachedPrograms = data || [];
-      renderPrograms();
-    }
+      const card = document.createElement("div");
+      card.className = "program-card";
 
-    function renderSwot() {
-      const map = {
-        strength: [],
-        weakness: [],
-        opportunity: [],
-        threat: []
-      };
+      card.innerHTML = `
+        <h3>${escapeHtml(program.program_name || "")}</h3>
 
-      cachedSwot.forEach(item => {
-        if (item.type && map[item.type]) map[item.type].push(item);
-      });
+        <div class="program-meta">
+          <div><strong>المجال:</strong> ${escapeHtml(program.field || "")}</div>
+          <div><strong>المؤشر:</strong> ${escapeHtml(program.indicator_name || "غير محدد")}</div>
+          <div><strong>المسؤول:</strong> ${escapeHtml(program.owner_role || "مشترك")}</div>
+          <div><strong>تاريخ التنفيذ:</strong> ${escapeHtml(program.start_date || "غير محدد")}</div>
+        </div>
 
-      function buildHtml(items) {
-        if (!items.length) return "لا توجد بيانات";
-        return items.map(item => `
-          <div class="item-box">
-            <div>${escapeHtml(item.description)}</div>
+        <div class="program-actions">
+          <div class="small-badges">
+            <span class="badge">${Number(program.progress || 0)}% إنجاز</span>
+            <span class="${statusClass(program.status)}">${escapeHtml(program.status || "قيد التنفيذ")}</span>
+            <span class="badge">الشواهد: ${evidenceCounts[program.id] || 0}</span>
+          </div>
+
+          <div class="inline-actions">
+            <button class="upload-evidence-btn btn-small" type="button"
+              onclick='openEvidenceModal(${JSON.stringify(program.id)}, ${JSON.stringify(program.program_name || "")})'>
+              رفع شاهد
+            </button>
+
             ${
-              canEditSwot() || canDeleteSwot()
-                ? `<div class="inline-actions">
-                    ${canEditSwot() ? `<button class="btn-secondary btn-small" type="button" onclick='startEditSwot(${JSON.stringify(item.id)})'>تعديل</button>` : ""}
-                    ${canDeleteSwot() ? `<button class="btn-danger btn-small" type="button" onclick='deleteSwot(${JSON.stringify(item.id)})'>حذف</button>` : ""}
-                  </div>`
+              canEditPrograms()
+                ? `<button class="btn-secondary btn-small" type="button" onclick='startEditProgram(${JSON.stringify(program.id)})'>تعديل</button>`
+                : ""
+            }
+
+            ${
+              canDeletePrograms()
+                ? `<button class="btn-danger btn-small" type="button" onclick='deleteProgram(${JSON.stringify(program.id)})'>حذف البرنامج</button>`
                 : ""
             }
           </div>
-        `).join("");
-      }
+        </div>
+      `;
 
-      document.getElementById("swot-strength").innerHTML = buildHtml(map.strength);
-      document.getElementById("swot-weakness").innerHTML = buildHtml(map.weakness);
-      document.getElementById("swot-opportunity").innerHTML = buildHtml(map.opportunity);
-      document.getElementById("swot-threat").innerHTML = buildHtml(map.threat);
+      container.appendChild(card);
+    });
+
+    updateLeadershipCards(cachedPrograms, cachedEvidence, cachedUsers);
+  }
+
+  async function loadPrograms() {
+    const { data, error } = await supabaseClient
+      .from("programs")
+      .select("*")
+      .order("field", { ascending: true });
+
+    if (error) {
+      console.log("programs error", error);
+      cachedPrograms = [];
+      document.getElementById("programs").innerHTML = '<div class="empty">تعذر تحميل البرامج</div>';
+      updateLeadershipCards([], cachedEvidence, cachedUsers);
+      return;
     }
 
-    async function loadSwot() {
-      const { data, error } = await supabaseClient
-        .from("swot")
-        .select("*")
-        .order("created_at", { ascending: false });
+    cachedPrograms = data || [];
+    renderPrograms();
+  }
 
-      if (error) {
-        console.log("swot error", error);
-        cachedSwot = [];
-        document.getElementById("swot-strength").textContent = "تعذر تحميل البيانات";
-        document.getElementById("swot-weakness").textContent = "تعذر تحميل البيانات";
-        document.getElementById("swot-opportunity").textContent = "تعذر تحميل البيانات";
-        document.getElementById("swot-threat").textContent = "تعذر تحميل البيانات";
-        return;
-      }
+  function renderSwot() {
+    const map = {
+      strength: [],
+      weakness: [],
+      opportunity: [],
+      threat: []
+    };
 
-      cachedSwot = data || [];
-      renderSwot();
-    }
+    cachedSwot.forEach(item => {
+      if (item.type && map[item.type]) map[item.type].push(item);
+    });
 
-    async function loadUsers() {
-      const pendingContainer = document.getElementById("usersList");
-      const activeContainer = document.getElementById("activeUsersList");
-      const blockedContainer = document.getElementById("blockedUsersList");
-
-      const { data, error } = await supabaseClient
-        .from("users")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.log("users error", error);
-        cachedUsers = [];
-        if (pendingContainer) pendingContainer.innerHTML = '<div class="empty">تعذر تحميل طلبات التسجيل</div>';
-        if (activeContainer) activeContainer.innerHTML = '<div class="empty">تعذر تحميل المستخدمين النشطين</div>';
-        if (blockedContainer) blockedContainer.innerHTML = '<div class="empty">تعذر تحميل المستخدمين الموقوفين</div>';
-        updateLeadershipCards(cachedPrograms, cachedEvidence, []);
-        return;
-      }
-
-      cachedUsers = data || [];
-      const pendingUsers = cachedUsers.filter(user => user.status === "pending");
-      const activeUsers = cachedUsers.filter(user => user.status === "active");
-      const blockedUsers = cachedUsers.filter(user => user.status === "blocked");
-
-      if (pendingContainer) {
-        if (!pendingUsers.length) {
-          pendingContainer.innerHTML = '<div class="empty">لا توجد طلبات تسجيل بانتظار الموافقة</div>';
-        } else {
-          pendingContainer.innerHTML = "";
-          pendingUsers.forEach(user => {
-            const card = document.createElement("div");
-            card.className = "program-card";
-            card.innerHTML = `
-              <h3>${escapeHtml(user.name || user.full_name || "")}</h3>
-              <div class="program-meta">
-                <div><strong>البريد:</strong> ${escapeHtml(user.email || "")}</div>
-                <div><strong>الدور:</strong> ${escapeHtml(user.role || "")}</div>
-                <div><strong>الحالة:</strong> بانتظار الموافقة</div>
-              </div>
-
-              <div class="program-actions">
-                <div class="small-badges">
-                  <span class="badge">${escapeHtml(user.role || "")}</span>
-                  <span class="badge">pending</span>
-                </div>
-
-                <div class="inline-actions">
-                  <button class="btn-primary btn-small" type="button" onclick='updateUserStatus("${user.id}", "active")'>قبول</button>
-                  <button class="btn-secondary btn-small" type="button" onclick='updateUserStatus("${user.id}", "blocked")'>رفض</button>
-                </div>
-              </div>
-            `;
-            pendingContainer.appendChild(card);
-          });
-        }
-      }
-
-      if (activeContainer) {
-        if (!activeUsers.length) {
-          activeContainer.innerHTML = '<div class="empty">لا يوجد مستخدمون نشطون بعد</div>';
-        } else {
-          activeContainer.innerHTML = "";
-          activeUsers.forEach(user => {
-            const card = document.createElement("div");
-            card.className = "program-card";
-            card.innerHTML = `
-              <h3>${escapeHtml(user.name || user.full_name || "")}</h3>
-              <div class="program-meta">
-                <div><strong>البريد:</strong> ${escapeHtml(user.email || "")}</div>
-                <div><strong>الدور:</strong> ${escapeHtml(user.role || "")}</div>
-                <div><strong>الحالة:</strong> نشط</div>
-              </div>
-
-              <div class="program-actions">
-                <div class="small-badges">
-                  <span class="badge">${escapeHtml(user.role || "")}</span>
-                  <span class="badge">active</span>
-                </div>
-
-                <div class="inline-actions">
-                  <button class="btn-secondary btn-small" type="button" onclick='updateUserStatus("${user.id}", "blocked")'>إيقاف</button>
-                </div>
-              </div>
-            `;
-            activeContainer.appendChild(card);
-          });
-        }
-      }
-
-      if (blockedContainer) {
-        if (!blockedUsers.length) {
-          blockedContainer.innerHTML = '<div class="empty">لا يوجد مستخدمون موقوفون</div>';
-        } else {
-          blockedContainer.innerHTML = "";
-          blockedUsers.forEach(user => {
-            const card = document.createElement("div");
-            card.className = "program-card";
-            card.innerHTML = `
-              <h3>${escapeHtml(user.name || user.full_name || "")}</h3>
-              <div class="program-meta">
-                <div><strong>البريد:</strong> ${escapeHtml(user.email || "")}</div>
-                <div><strong>الدور:</strong> ${escapeHtml(user.role || "")}</div>
-                <div><strong>الحالة:</strong> موقوف</div>
-              </div>
-
-              <div class="program-actions">
-                <div class="small-badges">
-                  <span class="badge">${escapeHtml(user.role || "")}</span>
-                  <span class="badge">blocked</span>
-                </div>
-
-                <div class="inline-actions">
-                  <button class="btn-primary btn-small" type="button" onclick='updateUserStatus("${user.id}", "active")'>إعادة تفعيل</button>
-                </div>
-              </div>
-            `;
-            blockedContainer.appendChild(card);
-          });
-        }
-      }
-
-      updateLeadershipCards(cachedPrograms, cachedEvidence, cachedUsers);
-    }
-
-    async function updateUserStatus(userId, newStatus) {
-      const { error } = await supabaseClient
-        .from("users")
-        .update({ status: newStatus })
-        .eq("id", userId);
-
-      if (error) {
-        alert("حدث خطأ أثناء تحديث حالة المستخدم");
-        console.log(error);
-        return;
-      }
-
-      alert("تم تحديث حالة المستخدم بنجاح");
-      await loadUsers();
-      await applyLoggedInRole();
-    }
-
-    function startEditProgram(programId) {
-      const program = cachedPrograms.find(p => p.id === programId);
-      if (!program) return;
-
-      document.getElementById("editingProgramId").value = program.id;
-      document.getElementById("field").value = program.field || "";
-      document.getElementById("indicator_name").value = program.indicator_name || "";
-      document.getElementById("program_name").value = program.program_name || "";
-      document.getElementById("owner_role").value = program.owner_role || "مشترك";
-      document.getElementById("start_date").value = program.start_date || "";
-      document.getElementById("progress").value = Number(program.progress || 0);
-      document.getElementById("status").value = program.status || "قيد التنفيذ";
-      document.getElementById("programFormTitle").textContent = "تعديل برنامج في الخطة التشغيلية";
-      scrollToSection("programFormSection");
-    }
-
-    function resetProgramForm() {
-      document.getElementById("editingProgramId").value = "";
-      document.getElementById("programForm").reset();
-      document.getElementById("owner_role").value = "مشترك";
-      document.getElementById("progress").value = 0;
-      document.getElementById("programFormTitle").textContent = "إضافة برنامج في الخطة التشغيلية";
-    }
-
-    async function deleteProgram(programId) {
-      const confirmed = confirm("هل أنت متأكدة من حذف البرنامج؟ سيتم حذف بياناته وشواهده المرتبطة نهائيًا.");
-      if (!confirmed) return;
-
-      const { error } = await supabaseClient
-        .from("programs")
-        .delete()
-        .eq("id", programId);
-
-      if (error) {
-        alert("حدث خطأ أثناء حذف البرنامج");
-        console.log(error);
-        return;
-      }
-
-      alert("تم حذف البرنامج بنجاح");
-      await refreshAll();
-    }
-
-    function startEditSwot(swotId) {
-      const item = cachedSwot.find(x => x.id === swotId);
-      if (!item) return;
-
-      document.getElementById("editingSwotId").value = item.id;
-      document.getElementById("swot_type").value = item.type || "strength";
-      document.getElementById("swot_description").value = item.description || "";
-      document.getElementById("swotFormTitle").textContent = "تعديل عنصر SWOT";
-      scrollToSection("swotFormSection");
-    }
-
-    function resetSwotForm() {
-      document.getElementById("editingSwotId").value = "";
-      document.getElementById("swotForm").reset();
-      document.getElementById("swotFormTitle").textContent = "إضافة عنصر لتحليل SWOT";
-    }
-
-    async function deleteSwot(swotId) {
-      const confirmed = confirm("هل أنت متأكدة من حذف هذا العنصر من SWOT؟");
-      if (!confirmed) return;
-
-      const { error } = await supabaseClient
-        .from("swot")
-        .delete()
-        .eq("id", swotId);
-
-      if (error) {
-        alert("حدث خطأ أثناء حذف عنصر SWOT");
-        console.log(error);
-        return;
-      }
-
-      alert("تم حذف عنصر SWOT بنجاح");
-      await loadSwot();
-    }
-
-    function openEvidenceModal(programId, programName) {
-      document.getElementById("evidenceProgramId").value = programId;
-      document.getElementById("evidenceModalTitle").textContent = "رفع شاهد - " + (programName || "");
-      document.getElementById("evidenceModal").style.display = "block";
-      document.getElementById("evidenceForm").reset();
-      loadEvidenceForProgram(programId);
-    }
-
-    function closeEvidenceModal() {
-      document.getElementById("evidenceModal").style.display = "none";
-    }
-
-    async function deleteEvidence(evidenceId) {
-      const confirmed = confirm("هل أنت متأكدة من حذف هذا الشاهد؟");
-      if (!confirmed) return;
-
-      const { error } = await supabaseClient
-        .from("evidence")
-        .delete()
-        .eq("id", evidenceId);
-
-      if (error) {
-        alert("حدث خطأ أثناء حذف الشاهد");
-        console.log(error);
-        return;
-      }
-
-      const programId = document.getElementById("evidenceProgramId").value;
-      await loadEvidenceCounts();
-      await loadEvidenceForProgram(programId);
-      await loadPrograms();
-      alert("تم حذف الشاهد بنجاح");
-    }
-
-    async function loadEvidenceForProgram(programId) {
-      const list = document.getElementById("evidenceList");
-
-      const { data, error } = await supabaseClient
-        .from("evidence")
-        .select("*")
-        .eq("program_id", programId)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.log("load evidence error", error);
-        list.className = "empty";
-        list.textContent = "تعذر تحميل الشواهد";
-        return;
-      }
-
-      if (!data.length) {
-        list.className = "empty";
-        list.textContent = "لا توجد شواهد بعد";
-        return;
-      }
-
-      list.className = "";
-      list.innerHTML = data.map(item => `
+    function buildHtml(items) {
+      if (!items.length) return "لا توجد بيانات";
+      return items.map(item => `
         <div class="item-box">
-          <strong>${escapeHtml(item.file_name || item.title || "شاهد")}</strong><br>
-          <span class="muted">رفع بواسطة: ${escapeHtml(item.uploaded_by || "غير محدد")}</span><br>
-          <a href="${escapeHtml(item.file_url || "#")}" target="_blank" rel="noopener noreferrer">فتح الشاهد</a>
+          <div>${escapeHtml(item.description)}</div>
           ${
-            canDeleteEvidence()
+            canEditSwot() || canDeleteSwot()
               ? `<div class="inline-actions">
-                  <button class="btn-danger btn-small" type="button" onclick='deleteEvidence(${JSON.stringify(item.id)})'>حذف الشاهد</button>
+                  ${canEditSwot() ? `<button class="btn-secondary btn-small" type="button" onclick='startEditSwot(${JSON.stringify(item.id)})'>تعديل</button>` : ""}
+                  ${canDeleteSwot() ? `<button class="btn-danger btn-small" type="button" onclick='deleteSwot(${JSON.stringify(item.id)})'>حذف</button>` : ""}
                 </div>`
               : ""
           }
@@ -1512,196 +1211,542 @@
       `).join("");
     }
 
-    async function refreshAll() {
-      await loadEvidenceCounts();
-      await loadUsers();
-      await loadPrograms();
-      await loadSwot();
-      await applyLoggedInRole();
-      renderPrograms();
-      renderSwot();
+    document.getElementById("swot-strength").innerHTML = buildHtml(map.strength);
+    document.getElementById("swot-weakness").innerHTML = buildHtml(map.weakness);
+    document.getElementById("swot-opportunity").innerHTML = buildHtml(map.opportunity);
+    document.getElementById("swot-threat").innerHTML = buildHtml(map.threat);
+  }
+
+  async function loadSwot() {
+    const { data, error } = await supabaseClient
+      .from("swot")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.log("swot error", error);
+      cachedSwot = [];
+      document.getElementById("swot-strength").textContent = "تعذر تحميل البيانات";
+      document.getElementById("swot-weakness").textContent = "تعذر تحميل البيانات";
+      document.getElementById("swot-opportunity").textContent = "تعذر تحميل البيانات";
+      document.getElementById("swot-threat").textContent = "تعذر تحميل البيانات";
+      return;
     }
 
-    document.getElementById("programForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
+    cachedSwot = data || [];
+    renderSwot();
+  }
 
-      const editingId = document.getElementById("editingProgramId").value;
+  async function loadUsers() {
+    const pendingContainer = document.getElementById("usersList");
+    const activeContainer = document.getElementById("activeUsersList");
+    const blockedContainer = document.getElementById("blockedUsersList");
 
-      const payload = {
-        field: document.getElementById("field").value,
-        indicator_name: document.getElementById("indicator_name").value,
-        program_name: document.getElementById("program_name").value,
-        owner_role: document.getElementById("owner_role").value || "مشترك",
-        start_date: document.getElementById("start_date").value || null,
-        progress: Number(document.getElementById("progress").value || 0),
-        status: document.getElementById("status").value
-      };
+    const { data, error } = await supabaseClient
+      .from("users")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-      if (editingId) {
-        const { error } = await supabaseClient.from("programs").update(payload).eq("id", editingId);
-        if (error) {
-          alert("حدث خطأ أثناء تعديل البرنامج");
-          console.log(error);
-          return;
-        }
-        alert("تم تعديل البرنامج بنجاح");
+    if (error) {
+      console.log("users error", error);
+      cachedUsers = [];
+      if (pendingContainer) pendingContainer.innerHTML = '<div class="empty">تعذر تحميل طلبات التسجيل</div>';
+      if (activeContainer) activeContainer.innerHTML = '<div class="empty">تعذر تحميل المستخدمين النشطين</div>';
+      if (blockedContainer) blockedContainer.innerHTML = '<div class="empty">تعذر تحميل المستخدمين الموقوفين</div>';
+      updateLeadershipCards(cachedPrograms, cachedEvidence, []);
+      return;
+    }
+
+    cachedUsers = data || [];
+    const pendingUsers = cachedUsers.filter(user => user.status === "pending");
+    const activeUsers = cachedUsers.filter(user => user.status === "active");
+    const blockedUsers = cachedUsers.filter(user => user.status === "blocked");
+
+    if (pendingContainer) {
+      if (!pendingUsers.length) {
+        pendingContainer.innerHTML = '<div class="empty">لا توجد طلبات تسجيل بانتظار الموافقة</div>';
       } else {
-        const { error } = await supabaseClient.from("programs").insert([payload]);
-        if (error) {
-          alert("حدث خطأ أثناء حفظ البرنامج");
-          console.log(error);
-          return;
-        }
-        alert("تم حفظ البرنامج بنجاح");
+        pendingContainer.innerHTML = "";
+        pendingUsers.forEach(user => {
+          const card = document.createElement("div");
+          card.className = "program-card";
+          card.innerHTML = `
+            <h3>${escapeHtml(user.name || user.full_name || "")}</h3>
+            <div class="program-meta">
+              <div><strong>البريد:</strong> ${escapeHtml(user.email || "")}</div>
+              <div><strong>الدور:</strong> ${escapeHtml(user.role || "")}</div>
+              <div><strong>الحالة:</strong> بانتظار الموافقة</div>
+            </div>
+
+            <div class="program-actions">
+              <div class="small-badges">
+                <span class="badge">${escapeHtml(user.role || "")}</span>
+                <span class="badge">pending</span>
+              </div>
+
+              <div class="inline-actions">
+                <button class="btn-primary btn-small" type="button" onclick='updateUserStatus("${user.id}", "active")'>قبول</button>
+                <button class="btn-secondary btn-small" type="button" onclick='updateUserStatus("${user.id}", "blocked")'>رفض</button>
+              </div>
+            </div>
+          `;
+          pendingContainer.appendChild(card);
+        });
       }
+    }
 
-      resetProgramForm();
-      await refreshAll();
-    });
-
-    document.getElementById("swotForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const editingId = document.getElementById("editingSwotId").value;
-      const payload = {
-        type: document.getElementById("swot_type").value,
-        description: document.getElementById("swot_description").value
-      };
-
-      if (editingId) {
-        const { error } = await supabaseClient.from("swot").update(payload).eq("id", editingId);
-        if (error) {
-          alert("حدث خطأ أثناء تعديل عنصر SWOT");
-          console.log(error);
-          return;
-        }
-        alert("تم تعديل عنصر SWOT بنجاح");
+    if (activeContainer) {
+      if (!activeUsers.length) {
+        activeContainer.innerHTML = '<div class="empty">لا يوجد مستخدمون نشطون بعد</div>';
       } else {
-        const { error } = await supabaseClient.from("swot").insert([payload]);
-        if (error) {
-          alert("حدث خطأ أثناء حفظ عنصر SWOT");
-          console.log(error);
-          return;
+        activeContainer.innerHTML = "";
+        activeUsers.forEach(user => {
+          const card = document.createElement("div");
+          card.className = "program-card";
+          card.innerHTML = `
+            <h3>${escapeHtml(user.name || user.full_name || "")}</h3>
+            <div class="program-meta">
+              <div><strong>البريد:</strong> ${escapeHtml(user.email || "")}</div>
+              <div><strong>الدور:</strong> ${escapeHtml(user.role || "")}</div>
+              <div><strong>الحالة:</strong> نشط</div>
+            </div>
+
+            <div class="program-actions">
+              <div class="small-badges">
+                <span class="badge">${escapeHtml(user.role || "")}</span>
+                <span class="badge">active</span>
+              </div>
+
+              <div class="inline-actions">
+                <button class="btn-secondary btn-small" type="button" onclick='updateUserStatus("${user.id}", "blocked")'>إيقاف</button>
+              </div>
+            </div>
+          `;
+          activeContainer.appendChild(card);
+        });
+      }
+    }
+
+    if (blockedContainer) {
+      if (!blockedUsers.length) {
+        blockedContainer.innerHTML = '<div class="empty">لا يوجد مستخدمون موقوفون</div>';
+      } else {
+        blockedContainer.innerHTML = "";
+        blockedUsers.forEach(user => {
+          const card = document.createElement("div");
+          card.className = "program-card";
+          card.innerHTML = `
+            <h3>${escapeHtml(user.name || user.full_name || "")}</h3>
+            <div class="program-meta">
+              <div><strong>البريد:</strong> ${escapeHtml(user.email || "")}</div>
+              <div><strong>الدور:</strong> ${escapeHtml(user.role || "")}</div>
+              <div><strong>الحالة:</strong> موقوف</div>
+            </div>
+
+            <div class="program-actions">
+              <div class="small-badges">
+                <span class="badge">${escapeHtml(user.role || "")}</span>
+                <span class="badge">blocked</span>
+              </div>
+
+              <div class="inline-actions">
+                <button class="btn-primary btn-small" type="button" onclick='updateUserStatus("${user.id}", "active")'>إعادة تفعيل</button>
+              </div>
+            </div>
+          `;
+          blockedContainer.appendChild(card);
+        });
+      }
+    }
+
+    updateLeadershipCards(cachedPrograms, cachedEvidence, cachedUsers);
+  }
+
+  async function updateUserStatus(userId, newStatus) {
+    const { error } = await supabaseClient
+      .from("users")
+      .update({ status: newStatus })
+      .eq("id", userId);
+
+    if (error) {
+      alert("حدث خطأ أثناء تحديث حالة المستخدم");
+      console.log(error);
+      return;
+    }
+
+    alert("تم تحديث حالة المستخدم بنجاح");
+    await loadUsers();
+    await applyLoggedInRole();
+  }
+
+  function startEditProgram(programId) {
+    const program = cachedPrograms.find(p => p.id === programId);
+    if (!program) return;
+
+    document.getElementById("editingProgramId").value = program.id;
+    document.getElementById("field").value = program.field || "";
+    document.getElementById("indicator_name").value = program.indicator_name || "";
+    document.getElementById("program_name").value = program.program_name || "";
+    document.getElementById("owner_role").value = program.owner_role || "مشترك";
+    document.getElementById("start_date").value = program.start_date || "";
+    document.getElementById("progress").value = Number(program.progress || 0);
+    document.getElementById("status").value = program.status || "قيد التنفيذ";
+    document.getElementById("programFormTitle").textContent = "تعديل برنامج في الخطة التشغيلية";
+    scrollToSection("programFormSection");
+  }
+
+  function resetProgramForm() {
+    document.getElementById("editingProgramId").value = "";
+    document.getElementById("programForm").reset();
+    document.getElementById("owner_role").value = "مشترك";
+    document.getElementById("progress").value = 0;
+    document.getElementById("programFormTitle").textContent = "إضافة برنامج في الخطة التشغيلية";
+  }
+
+  async function deleteProgram(programId) {
+    const confirmed = confirm("هل أنت متأكدة من حذف البرنامج؟ سيتم حذف بياناته وشواهده المرتبطة نهائيًا.");
+    if (!confirmed) return;
+
+    const { error } = await supabaseClient
+      .from("programs")
+      .delete()
+      .eq("id", programId);
+
+    if (error) {
+      alert("حدث خطأ أثناء حذف البرنامج");
+      console.log(error);
+      return;
+    }
+
+    alert("تم حذف البرنامج بنجاح");
+    await refreshAll();
+  }
+
+  function startEditSwot(swotId) {
+    const item = cachedSwot.find(x => x.id === swotId);
+    if (!item) return;
+
+    document.getElementById("editingSwotId").value = item.id;
+    document.getElementById("swot_type").value = item.type || "strength";
+    document.getElementById("swot_description").value = item.description || "";
+    document.getElementById("swotFormTitle").textContent = "تعديل عنصر SWOT";
+    scrollToSection("swotFormSection");
+  }
+
+  function resetSwotForm() {
+    document.getElementById("editingSwotId").value = "";
+    document.getElementById("swotForm").reset();
+    document.getElementById("swotFormTitle").textContent = "إضافة عنصر لتحليل SWOT";
+  }
+
+  async function deleteSwot(swotId) {
+    const confirmed = confirm("هل أنت متأكدة من حذف هذا العنصر من SWOT؟");
+    if (!confirmed) return;
+
+    const { error } = await supabaseClient
+      .from("swot")
+      .delete()
+      .eq("id", swotId);
+
+    if (error) {
+      alert("حدث خطأ أثناء حذف عنصر SWOT");
+      console.log(error);
+      return;
+    }
+
+    alert("تم حذف عنصر SWOT بنجاح");
+    await loadSwot();
+  }
+
+  function openEvidenceModal(programId, programName) {
+    document.getElementById("evidenceProgramId").value = programId;
+    document.getElementById("evidenceModalTitle").textContent = "رفع شاهد - " + (programName || "");
+    document.getElementById("evidenceModal").style.display = "block";
+    document.getElementById("evidenceForm").reset();
+    loadEvidenceForProgram(programId);
+  }
+
+  function closeEvidenceModal() {
+    document.getElementById("evidenceModal").style.display = "none";
+  }
+
+  async function deleteEvidence(evidenceId) {
+    const confirmed = confirm("هل أنت متأكدة من حذف هذا الشاهد؟");
+    if (!confirmed) return;
+
+    const { error } = await supabaseClient
+      .from("evidence")
+      .delete()
+      .eq("id", evidenceId);
+
+    if (error) {
+      alert("حدث خطأ أثناء حذف الشاهد");
+      console.log(error);
+      return;
+    }
+
+    const programId = document.getElementById("evidenceProgramId").value;
+    await loadEvidenceCounts();
+    await loadEvidenceForProgram(programId);
+    await loadPrograms();
+    alert("تم حذف الشاهد بنجاح");
+  }
+
+  async function loadEvidenceForProgram(programId) {
+    const list = document.getElementById("evidenceList");
+
+    const { data, error } = await supabaseClient
+      .from("evidence")
+      .select("*")
+      .eq("program_id", programId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.log("load evidence error", error);
+      list.className = "empty";
+      list.textContent = "تعذر تحميل الشواهد";
+      return;
+    }
+
+    if (!data.length) {
+      list.className = "empty";
+      list.textContent = "لا توجد شواهد بعد";
+      return;
+    }
+
+    list.className = "";
+    list.innerHTML = data.map(item => `
+      <div class="item-box">
+        <strong>${escapeHtml(item.file_name || item.title || "شاهد")}</strong><br>
+        <span class="muted">رفع بواسطة: ${escapeHtml(item.uploaded_by || "غير محدد")}</span><br>
+        <a href="${escapeHtml(item.file_url || "#")}" target="_blank" rel="noopener noreferrer">فتح الشاهد</a>
+        ${
+          canDeleteEvidence()
+            ? `<div class="inline-actions">
+                <button class="btn-danger btn-small" type="button" onclick='deleteEvidence(${JSON.stringify(item.id)})'>حذف الشاهد</button>
+              </div>`
+            : ""
         }
-        alert("تم حفظ عنصر SWOT بنجاح");
-      }
+      </div>
+    `).join("");
+  }
 
-      resetSwotForm();
-      await loadSwot();
-    });
+  async function refreshAll() {
+    await loadEvidenceCounts();
+    await loadUsers();
+    await loadPrograms();
+    await loadSwot();
+    await applyLoggedInRole();
+    renderPrograms();
+    renderSwot();
+  }
 
-    document.getElementById("evidenceForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
+  document.getElementById("programForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      const programId = document.getElementById("evidenceProgramId").value;
-      const uploaderName = document.getElementById("uploaderName").value;
-      const uploaderRole = document.getElementById("uploaderRole").value;
-      const title = document.getElementById("evidenceTitle").value;
-      const file = document.getElementById("evidenceFile").files[0];
+    const editingId = document.getElementById("editingProgramId").value;
 
-      if (!file) {
-        alert("يرجى اختيار ملف أو صورة");
-        return;
-      }
-
-      const safeFileName = file.name.replace(/\s+/g, "-");
-      const filePath = `${programId}/${Date.now()}-${safeFileName}`;
-
-      const uploadResult = await supabaseClient.storage.from("evidence").upload(filePath, file);
-
-      if (uploadResult.error) {
-        alert("حدث خطأ أثناء رفع الملف");
-        console.log(uploadResult.error);
-        return;
-      }
-
-      const publicUrlData = supabaseClient.storage.from("evidence").getPublicUrl(filePath);
-      const publicUrl = publicUrlData?.data?.publicUrl || "";
-
-      const { error } = await supabaseClient
-        .from("evidence")
-        .insert([{
-          program_id: programId,
-          file_url: publicUrl,
-          file_name: title || file.name,
-          uploaded_by: `${uploaderName} | ${uploaderRole}`
-        }]);
-
-      if (error) {
-        alert("تم رفع الملف لكن تعذر حفظ السجل");
-        console.log(error);
-        return;
-      }
-
-      alert("تم حفظ الشاهد بنجاح");
-      document.getElementById("evidenceForm").reset();
-      await loadEvidenceCounts();
-      await loadEvidenceForProgram(programId);
-      await loadPrograms();
-    });
-
-    document.getElementById("registerForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const payload = {
-        name: document.getElementById("register_name").value,
-        email: document.getElementById("register_email").value,
-        role: document.getElementById("register_role").value,
-        status: "pending"
-      };
-
-      const { error } = await supabaseClient.from("users").insert([payload]);
-
-      if (error) {
-        alert("حدث خطأ أثناء إرسال طلب التسجيل");
-        console.log(error);
-        return;
-      }
-
-      alert("تم إرسال طلب التسجيل بنجاح، وبانتظار اعتماد الإدارة");
-      document.getElementById("registerForm").reset();
-      await loadUsers();
-    });
-
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
-      const loginStatus = document.getElementById("loginStatus");
-
-      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        loginStatus.textContent = "فشل تسجيل الدخول";
-        console.log(error);
-        return;
-      }
-
-      document.getElementById("loginForm").reset();
-      await applyLoggedInRole();
-      await refreshAll();
-    });
-
-    document.getElementById("logoutBtn").addEventListener("click", async () => {
-      await supabaseClient.auth.signOut();
-      currentUserRole = null;
-      currentUserEmail = null;
-      document.getElementById("logoutBtn").style.display = "none";
-      document.getElementById("loginStatus").textContent = "تم تسجيل الخروج";
-      applyRoleView();
-      await refreshAll();
-    });
-
-    document.getElementById("programSearchInput").addEventListener("input", renderPrograms);
-    document.getElementById("programFieldFilter").addEventListener("change", renderPrograms);
-
-    window.onclick = function(event) {
-      const modal = document.getElementById("evidenceModal");
-      if (event.target === modal) closeEvidenceModal();
+    const payload = {
+      field: document.getElementById("field").value,
+      indicator_name: document.getElementById("indicator_name").value,
+      program_name: document.getElementById("program_name").value,
+      owner_role: document.getElementById("owner_role").value || "مشترك",
+      start_date: document.getElementById("start_date").value || null,
+      progress: Number(document.getElementById("progress").value || 0),
+      status: document.getElementById("status").value
     };
 
-    refreshAll();
-  </script>
+    if (editingId) {
+      const { error } = await supabaseClient.from("programs").update(payload).eq("id", editingId);
+      if (error) {
+        alert("حدث خطأ أثناء تعديل البرنامج");
+        console.log(error);
+        return;
+      }
+      alert("تم تعديل البرنامج بنجاح");
+    } else {
+      const { error } = await supabaseClient.from("programs").insert([payload]);
+      if (error) {
+        alert("حدث خطأ أثناء حفظ البرنامج");
+        console.log(error);
+        return;
+      }
+      alert("تم حفظ البرنامج بنجاح");
+    }
+
+    resetProgramForm();
+    await refreshAll();
+  });
+
+  document.getElementById("swotForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const editingId = document.getElementById("editingSwotId").value;
+    const payload = {
+      type: document.getElementById("swot_type").value,
+      description: document.getElementById("swot_description").value
+    };
+
+    if (editingId) {
+      const { error } = await supabaseClient.from("swot").update(payload).eq("id", editingId);
+      if (error) {
+        alert("حدث خطأ أثناء تعديل عنصر SWOT");
+        console.log(error);
+        return;
+      }
+      alert("تم تعديل عنصر SWOT بنجاح");
+    } else {
+      const { error } = await supabaseClient.from("swot").insert([payload]);
+      if (error) {
+        alert("حدث خطأ أثناء حفظ عنصر SWOT");
+        console.log(error);
+        return;
+      }
+      alert("تم حفظ عنصر SWOT بنجاح");
+    }
+
+    resetSwotForm();
+    await loadSwot();
+  });
+
+  document.getElementById("evidenceForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const programId = document.getElementById("evidenceProgramId").value;
+    const uploaderName = document.getElementById("uploaderName").value.trim();
+    const uploaderRole = document.getElementById("uploaderRole").value;
+    const title = document.getElementById("evidenceTitle").value.trim();
+    const file = document.getElementById("evidenceFile").files[0];
+
+    if (!file) {
+      alert("يرجى اختيار ملف أو صورة");
+      return;
+    }
+
+    if (!isAllowedFileType(file)) {
+      alert("الملف غير مدعوم. المسموح: PDF أو PNG أو JPG أو WEBP");
+      return;
+    }
+
+    const maxSizeMB = 10;
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      alert("حجم الملف كبير جدًا. الحد الأقصى 10MB");
+      return;
+    }
+
+    const safeFileName = sanitizeFileName(file.name);
+    const filePath = `${programId}/${Date.now()}-${safeFileName}`;
+
+    const uploadResult = await supabaseClient.storage
+      .from("evidence")
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: file.type || undefined
+      });
+
+    if (uploadResult.error) {
+      console.log("uploadResult.error", uploadResult.error);
+      alert(`تعذر رفع الملف: ${uploadResult.error.message || "خطأ غير معروف"}`);
+      return;
+    }
+
+    const publicUrlData = supabaseClient.storage
+      .from("evidence")
+      .getPublicUrl(filePath);
+
+    const publicUrl = publicUrlData?.data?.publicUrl || "";
+
+    if (!publicUrl) {
+      alert("تم رفع الملف لكن تعذر إنشاء رابط العرض");
+      return;
+    }
+
+    const { error } = await supabaseClient
+      .from("evidence")
+      .insert([{
+        program_id: programId,
+        file_url: publicUrl,
+        file_name: title || file.name,
+        uploaded_by: `${uploaderName} | ${uploaderRole}`
+      }]);
+
+    if (error) {
+      console.log("evidence insert error", error);
+      alert(`تم رفع الملف لكن تعذر حفظ السجل: ${error.message || "خطأ غير معروف"}`);
+      return;
+    }
+
+    alert("تم حفظ الشاهد بنجاح");
+    document.getElementById("evidenceForm").reset();
+    await loadEvidenceCounts();
+    await loadEvidenceForProgram(programId);
+    await loadPrograms();
+  });
+
+  document.getElementById("registerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      name: document.getElementById("register_name").value,
+      email: document.getElementById("register_email").value,
+      role: document.getElementById("register_role").value,
+      status: "pending"
+    };
+
+    const { error } = await supabaseClient.from("users").insert([payload]);
+
+    if (error) {
+      alert("حدث خطأ أثناء إرسال طلب التسجيل");
+      console.log(error);
+      return;
+    }
+
+    alert("تم إرسال طلب التسجيل بنجاح، وبانتظار اعتماد الإدارة");
+    document.getElementById("registerForm").reset();
+    await loadUsers();
+  });
+
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+    const loginStatus = document.getElementById("loginStatus");
+
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      loginStatus.textContent = "فشل تسجيل الدخول";
+      console.log(error);
+      return;
+    }
+
+    document.getElementById("loginForm").reset();
+    await applyLoggedInRole();
+    await refreshAll();
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    await supabaseClient.auth.signOut();
+    currentUserRole = null;
+    currentUserEmail = null;
+    document.getElementById("logoutBtn").style.display = "none";
+    document.getElementById("loginStatus").textContent = "تم تسجيل الخروج";
+    applyRoleView();
+    await refreshAll();
+  });
+
+  document.getElementById("programSearchInput").addEventListener("input", renderPrograms);
+  document.getElementById("programFieldFilter").addEventListener("change", renderPrograms);
+
+  window.onclick = function(event) {
+    const modal = document.getElementById("evidenceModal");
+    if (event.target === modal) closeEvidenceModal();
+  };
+
+  refreshAll();
+</script>
+ 
 </body>
 </html>
