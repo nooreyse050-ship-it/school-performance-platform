@@ -94,9 +94,9 @@
 
     .actions {
       display: flex;
-      gap: 8px;
-      margin-top: 12px;
+      gap: 10px;
       flex-wrap: wrap;
+      margin-top: 12px;
     }
 
     .actions a {
@@ -108,7 +108,7 @@
 </head>
 <body>
   <div class="card">
-    <h1>Login</h1>
+    <h1>تسجيل الدخول</h1>
 
     <div id="loginMessage" class="message-box"></div>
 
@@ -127,7 +127,7 @@
       <a href="index.html">العودة للرئيسية</a>
     </div>
 
-    <div class="muted">بعد تسجيل الدخول سيتم إعادتك تلقائيًا إلى الصفحة السابقة</div>
+    <div class="muted">بعد تسجيل الدخول سيتم إعادتك تلقائيًا إلى الصفحة الرئيسية</div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -149,10 +149,13 @@
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const email = document.getElementById("loginEmail").value;
+      const email = document.getElementById("loginEmail").value.trim();
       const password = document.getElementById("loginPassword").value;
 
-      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      const { error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
 
       if (error) {
         console.log(error);
