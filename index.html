@@ -48,6 +48,98 @@
       box-shadow: 0 4px 14px rgba(0,0,0,0.08);
     }
 
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .profile-wrapper {
+      position: relative;
+      margin-inline-start: auto;
+    }
+
+    .profile-trigger {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #fff;
+      border: 1px solid var(--green-border);
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+
+    .avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #f3f4f6, #e5e7eb);
+      border: 2px solid var(--green-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6b7280;
+      font-size: 22px;
+      font-weight: bold;
+      overflow: hidden;
+    }
+
+    .profile-mini {
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+      line-height: 1.6;
+    }
+
+    .profile-name {
+      font-weight: bold;
+      color: var(--green-dark);
+      font-size: 15px;
+    }
+
+    .profile-role {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .profile-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      min-width: 260px;
+      background: #fff;
+      border: 1px solid var(--green-border);
+      border-radius: 18px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+      padding: 14px;
+      display: none;
+      z-index: 1000;
+    }
+
+    .profile-menu.open {
+      display: block;
+    }
+
+    .profile-menu .menu-title {
+      font-weight: bold;
+      color: var(--green-dark);
+      margin-bottom: 10px;
+    }
+
+    .profile-menu .menu-userbox {
+      background: #f6fbf7;
+      border: 1px solid var(--green-border);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+      line-height: 1.8;
+    }
+
     .hero {
       padding: 24px;
       margin-bottom: 16px;
@@ -494,11 +586,59 @@
         flex-direction: column;
         align-items: stretch;
       }
+      .top-bar {
+        justify-content: center;
+      }
+      .profile-wrapper {
+        margin-inline-start: 0;
+      }
+      .profile-menu {
+        left: 50%;
+        transform: translateX(-50%);
+        width: 280px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <div class="top-bar">
+      <div class="profile-wrapper">
+        <button class="profile-trigger" id="profileTrigger" type="button">
+          <div class="avatar" id="profileAvatar">👤</div>
+          <div class="profile-mini">
+            <div class="profile-name" id="profileMiniName">زائر</div>
+            <div class="profile-role" id="profileMiniRole">غير مسجل</div>
+          </div>
+        </button>
+
+        <div class="profile-menu" id="profileMenu">
+          <div class="menu-title">الحساب</div>
+
+          <div id="guestMenuArea">
+            <div class="menu-userbox">
+              لم يتم تسجيل الدخول بعد
+            </div>
+            <div class="inline-actions">
+              <button class="btn-primary btn-small" type="button" onclick="goToLogin()">Login</button>
+              <button class="btn-secondary btn-small" type="button" onclick="goToSignup()">Sign up</button>
+            </div>
+          </div>
+
+          <div id="userMenuArea" style="display:none;">
+            <div class="menu-userbox">
+              <div><strong>الاسم:</strong> <span id="menuUserName">-</span></div>
+              <div><strong>الرتبة:</strong> <span id="menuUserRole">-</span></div>
+              <div><strong>البريد:</strong> <span id="menuUserEmail">-</span></div>
+            </div>
+            <div class="inline-actions">
+              <button class="btn-danger btn-small" type="button" onclick="handleLogout()">تسجيل الخروج</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <section class="hero">
       <h1>منصة قيادة الأداء المدرسي</h1>
       <p>النخيل الابتدائية بالقطيف – طفولة مبكرة والروضة الملحقة بها</p>
@@ -524,12 +664,7 @@
     <section class="section" id="authSection">
       <h2>الدخول إلى المنصة</h2>
       <div id="globalMessage" class="message-box"></div>
-
-      <div class="inline-actions">
-        <button class="btn-primary" id="authActionBtn" type="button">تسجيل الدخول</button>
-      </div>
-
-      <div id="loginStatus" class="muted" style="margin-top:10px;"></div>
+      <div id="loginStatus" class="muted"></div>
     </section>
 
     <section class="section section-anchor" id="leadershipSection">
@@ -835,6 +970,7 @@
     let evidenceCounts = {};
     let currentUserRole = null;
     let currentUserEmail = null;
+    let currentUserName = null;
     let cachedPrograms = [];
     let cachedUsers = [];
     let cachedEvidence = [];
@@ -854,6 +990,14 @@
       box.className = "message-box";
       box.textContent = "";
       box.style.display = "none";
+    }
+
+    function goToLogin() {
+      window.location.href = "login.html?return=index.html";
+    }
+
+    function goToSignup() {
+      window.location.href = "signup.html?return=index.html";
     }
 
     function statusClass(status) {
@@ -902,6 +1046,57 @@
       return ["مديرة المدرسة", "وكيلة"].includes(currentUserRole);
     }
 
+    function toggleProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      menu.classList.toggle("open");
+    }
+
+    function closeProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      menu.classList.remove("open");
+    }
+
+    function renderProfileCard() {
+      const avatar = document.getElementById("profileAvatar");
+      const miniName = document.getElementById("profileMiniName");
+      const miniRole = document.getElementById("profileMiniRole");
+      const guestArea = document.getElementById("guestMenuArea");
+      const userArea = document.getElementById("userMenuArea");
+
+      if (!currentUserEmail) {
+        avatar.textContent = "👤";
+        miniName.textContent = "زائر";
+        miniRole.textContent = "غير مسجل";
+        guestArea.style.display = "block";
+        userArea.style.display = "none";
+        return;
+      }
+
+      const initial = currentUserName ? currentUserName.trim().charAt(0) : "U";
+      avatar.textContent = initial;
+      miniName.textContent = currentUserName || "مستخدم";
+      miniRole.textContent = currentUserRole || "بدون رتبة";
+      guestArea.style.display = "none";
+      userArea.style.display = "block";
+
+      document.getElementById("menuUserName").textContent = currentUserName || "-";
+      document.getElementById("menuUserRole").textContent = currentUserRole || "-";
+      document.getElementById("menuUserEmail").textContent = currentUserEmail || "-";
+    }
+
+    async function handleLogout() {
+      closeProfileMenu();
+      clearMessage("globalMessage");
+      await supabaseClient.auth.signOut();
+      currentUserRole = null;
+      currentUserEmail = null;
+      currentUserName = null;
+      renderProfileCard();
+      showMessage("globalMessage", "success", "تم تسجيل الخروج");
+      await applyLoggedInRole();
+      await refreshAll();
+    }
+
     function applyRoleView() {
       const role = currentUserRole;
 
@@ -924,37 +1119,6 @@
       if (blockedUsersSection) blockedUsersSection.style.display = canManageUsers() ? "block" : "none";
     }
 
-    async function updateAuthButton() {
-      const btn = document.getElementById("authActionBtn");
-      const loginStatus = document.getElementById("loginStatus");
-
-      const { data, error } = await supabaseClient.auth.getUser();
-      const user = data?.user;
-
-      if (error) console.log(error);
-
-      if (user) {
-        btn.textContent = "تسجيل الخروج";
-        loginStatus.textContent = `مسجل الدخول: ${user.email}`;
-        btn.onclick = async () => {
-          clearMessage("globalMessage");
-          await supabaseClient.auth.signOut();
-          currentUserRole = null;
-          currentUserEmail = null;
-          showMessage("globalMessage", "success", "تم تسجيل الخروج");
-          await applyLoggedInRole();
-          await updateAuthButton();
-          await refreshAll();
-        };
-      } else {
-        btn.textContent = "تسجيل الدخول";
-        loginStatus.textContent = "لم يتم تسجيل الدخول بعد";
-        btn.onclick = () => {
-          window.location.href = "login.html?return=index.html";
-        };
-      }
-    }
-
     async function getUserRole(email) {
       const { data, error } = await supabaseClient
         .from("users")
@@ -975,6 +1139,7 @@
     }
 
     async function applyLoggedInRole() {
+      const loginStatus = document.getElementById("loginStatus");
       const { data: authData, error } = await supabaseClient.auth.getUser();
       const user = authData?.user;
 
@@ -983,21 +1148,47 @@
       if (!user) {
         currentUserRole = null;
         currentUserEmail = null;
+        currentUserName = null;
+        loginStatus.textContent = "لم يتم تسجيل الدخول بعد";
         applyRoleView();
+        renderProfileCard();
         return;
       }
 
       currentUserEmail = user.email;
       const roleData = await getUserRole(user.email);
 
-      if (!roleData || roleData.status !== "active") {
+      if (!roleData) {
         currentUserRole = null;
+        currentUserName = null;
+        loginStatus.textContent = "تم تسجيل الدخول، لكن لا يوجد سجل مستخدم مرتبط بهذا البريد";
         applyRoleView();
+        renderProfileCard();
+        return;
+      }
+
+      currentUserName = roleData.name || "مستخدم";
+
+      if (roleData.status === "pending") {
+        currentUserRole = null;
+        loginStatus.textContent = "الحساب بانتظار موافقة الإدارة";
+        applyRoleView();
+        renderProfileCard();
+        return;
+      }
+
+      if (roleData.status === "blocked") {
+        currentUserRole = null;
+        loginStatus.textContent = "هذا الحساب موقوف";
+        applyRoleView();
+        renderProfileCard();
         return;
       }
 
       currentUserRole = roleData.role;
+      loginStatus.textContent = `مرحبًا ${currentUserName} | الرتبة: ${currentUserRole}`;
       applyRoleView();
+      renderProfileCard();
     }
 
     function getSafeExtension(file) {
@@ -1683,7 +1874,6 @@
       await loadPrograms();
       await loadSwot();
       await applyLoggedInRole();
-      await updateAuthButton();
       renderPrograms();
       renderSwot();
     }
@@ -1862,6 +2052,19 @@
     document.getElementById("programSearchInput").addEventListener("input", renderPrograms);
     document.getElementById("programFieldFilter").addEventListener("change", renderPrograms);
     document.getElementById("programYearFilter").addEventListener("change", renderPrograms);
+
+    document.getElementById("profileTrigger").addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleProfileMenu();
+    });
+
+    document.addEventListener("click", (e) => {
+      const menu = document.getElementById("profileMenu");
+      const trigger = document.getElementById("profileTrigger");
+      if (!menu.contains(e.target) && !trigger.contains(e.target)) {
+        closeProfileMenu();
+      }
+    });
 
     window.onclick = function(event) {
       const modal = document.getElementById("evidenceModal");
