@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>منصة رقمية لإدارة ومتابعة تنفيذ الخطة التشغيلية في المدرسة</title>
+  <title>منصة قيادة الأداء المدرسي</title>
   <style>
     * { box-sizing: border-box; }
 
@@ -415,7 +415,7 @@
 
     .toolbar {
       display: grid;
-      grid-template-columns: 1fr 220px;
+      grid-template-columns: 1fr 220px 160px;
       gap: 12px;
       margin-bottom: 18px;
     }
@@ -500,7 +500,7 @@
 <body>
   <div class="container">
     <section class="hero">
-      <h1>منصة رقمية لإدارة ومتابعة تنفيذ الخطة التشغيلية في المدرسة</h1>
+      <h1>منصة قيادة الأداء المدرسي</h1>
       <p>النخيل الابتدائية بالقطيف – طفولة مبكرة والروضة الملحقة بها</p>
       <p>لوحة متكاملة لمتابعة الخطة التشغيلية ومؤشرات الأداء والتوثيق المؤسسي</p>
 
@@ -522,21 +522,11 @@
     </section>
 
     <section class="section" id="authSection">
-      <h2>تسجيل الدخول</h2>
+      <h2>الدخول إلى المنصة</h2>
       <div id="globalMessage" class="message-box"></div>
 
-      <form id="loginForm">
-        <label>البريد الإلكتروني</label>
-        <input id="loginEmail" type="email" placeholder="example@email.com" required />
-
-        <label>كلمة المرور</label>
-        <input id="loginPassword" type="password" placeholder="أدخلي كلمة المرور" required />
-
-        <button class="btn-primary" type="submit">دخول</button>
-      </form>
-
-      <div style="margin-top:12px;">
-        <button class="btn-secondary" id="logoutBtn" style="display:none;">تسجيل الخروج</button>
+      <div class="inline-actions">
+        <button class="btn-primary" id="authActionBtn" type="button">تسجيل الدخول</button>
       </div>
 
       <div id="loginStatus" class="muted" style="margin-top:10px;"></div>
@@ -615,10 +605,27 @@
       <div id="blockedUsersList" class="program-cards"></div>
     </section>
 
+    <section class="section" id="renewPlanSection" style="display:none;">
+      <h2>تجديد الخطة للعام القادم</h2>
+
+      <label>نسخ من عام</label>
+      <input id="sourcePlanYear" type="text" value="1447هـ" />
+
+      <label>إلى عام جديد</label>
+      <input id="targetPlanYear" type="text" value="1448هـ" />
+
+      <div class="inline-actions">
+        <button class="btn-primary" type="button" onclick="renewPlanToNewYear()">تجديد الخطة</button>
+      </div>
+    </section>
+
     <section class="section section-anchor" id="programFormSection" style="display:none;">
       <h2 id="programFormTitle">إضافة برنامج في الخطة التشغيلية</h2>
       <form id="programForm">
         <input type="hidden" id="editingProgramId" />
+
+        <label>العام الخطي</label>
+        <input id="plan_year" type="text" value="1447هـ" />
 
         <label>المجال</label>
         <select id="field" required>
@@ -670,6 +677,12 @@
           <option value="نواتج التعلم">نواتج التعلم</option>
           <option value="البيئة المدرسية">البيئة المدرسية</option>
           <option value="الشراكة المجتمعية">الشراكة المجتمعية</option>
+        </select>
+        <select id="programYearFilter">
+          <option value="">كل الأعوام</option>
+          <option value="1447هـ">1447هـ</option>
+          <option value="1448هـ">1448هـ</option>
+          <option value="1449هـ">1449هـ</option>
         </select>
       </div>
 
@@ -897,16 +910,49 @@
       const activeUsersSection = document.getElementById("activeUsersSection");
       const blockedUsersSection = document.getElementById("blockedUsersSection");
       const swotFormSection = document.getElementById("swotFormSection");
+      const renewPlanSection = document.getElementById("renewPlanSection");
 
       const canSeeProgramForm = ["مديرة المدرسة", "وكيلة", "موجهة طلابية", "مساعد إداري"].includes(role);
       const canSeeSwotForm = ["مديرة المدرسة", "وكيلة"].includes(role);
 
       if (programFormSection) programFormSection.style.display = canSeeProgramForm ? "block" : "none";
       if (swotFormSection) swotFormSection.style.display = canSeeSwotForm ? "block" : "none";
+      if (renewPlanSection) renewPlanSection.style.display = canManageUsers() ? "block" : "none";
 
       if (adminUsersSection) adminUsersSection.style.display = canManageUsers() ? "block" : "none";
       if (activeUsersSection) activeUsersSection.style.display = canManageUsers() ? "block" : "none";
       if (blockedUsersSection) blockedUsersSection.style.display = canManageUsers() ? "block" : "none";
+    }
+
+    async function updateAuthButton() {
+      const btn = document.getElementById("authActionBtn");
+      const loginStatus = document.getElementById("loginStatus");
+
+      const { data, error } = await supabaseClient.auth.getUser();
+      const user = data?.user;
+
+      if (error) console.log(error);
+
+      if (user) {
+        btn.textContent = "تسجيل الخروج";
+        loginStatus.textContent = `مسجل الدخول: ${user.email}`;
+        btn.onclick = async () => {
+          clearMessage("globalMessage");
+          await supabaseClient.auth.signOut();
+          currentUserRole = null;
+          currentUserEmail = null;
+          showMessage("globalMessage", "success", "تم تسجيل الخروج");
+          await applyLoggedInRole();
+          await updateAuthButton();
+          await refreshAll();
+        };
+      } else {
+        btn.textContent = "تسجيل الدخول";
+        loginStatus.textContent = "لم يتم تسجيل الدخول بعد";
+        btn.onclick = () => {
+          window.location.href = "login.html?return=index.html";
+        };
+      }
     }
 
     async function getUserRole(email) {
@@ -929,9 +975,6 @@
     }
 
     async function applyLoggedInRole() {
-      const logoutBtn = document.getElementById("logoutBtn");
-      const loginStatus = document.getElementById("loginStatus");
-
       const { data: authData, error } = await supabaseClient.auth.getUser();
       const user = authData?.user;
 
@@ -940,8 +983,6 @@
       if (!user) {
         currentUserRole = null;
         currentUserEmail = null;
-        if (logoutBtn) logoutBtn.style.display = "none";
-        if (loginStatus) loginStatus.textContent = "لم يتم تسجيل الدخول بعد";
         applyRoleView();
         return;
       }
@@ -949,33 +990,13 @@
       currentUserEmail = user.email;
       const roleData = await getUserRole(user.email);
 
-      if (!roleData) {
+      if (!roleData || roleData.status !== "active") {
         currentUserRole = null;
-        if (logoutBtn) logoutBtn.style.display = "inline-block";
-        if (loginStatus) loginStatus.textContent = "تم تسجيل الدخول، لكن لا يوجد سجل مستخدم مرتبط بهذا البريد";
-        applyRoleView();
-        return;
-      }
-
-      if (roleData.status === "pending") {
-        currentUserRole = null;
-        if (logoutBtn) logoutBtn.style.display = "inline-block";
-        if (loginStatus) loginStatus.textContent = "طلبك ما زال بانتظار موافقة الإدارة";
-        applyRoleView();
-        return;
-      }
-
-      if (roleData.status === "blocked") {
-        currentUserRole = null;
-        if (logoutBtn) logoutBtn.style.display = "inline-block";
-        if (loginStatus) loginStatus.textContent = "هذا الحساب موقوف، راجعي الإدارة";
         applyRoleView();
         return;
       }
 
       currentUserRole = roleData.role;
-      if (logoutBtn) logoutBtn.style.display = "inline-block";
-      if (loginStatus) loginStatus.textContent = `مرحبًا ${roleData.name || ""} | الدور: ${roleData.role}`;
       applyRoleView();
     }
 
@@ -996,7 +1017,6 @@
         const ext = name.slice(dot + 1).toLowerCase().replace(/[^a-z0-9]/g, "");
         if (ext) return ext;
       }
-
       return "bin";
     }
 
@@ -1125,7 +1145,6 @@
 
       evidenceCounts = {};
       cachedEvidence = data || [];
-
       cachedEvidence.forEach(item => {
         evidenceCounts[item.program_id] = (evidenceCounts[item.program_id] || 0) + 1;
       });
@@ -1134,20 +1153,23 @@
     function getFilteredPrograms() {
       const search = (document.getElementById("programSearchInput")?.value || "").trim().toLowerCase();
       const fieldFilter = document.getElementById("programFieldFilter")?.value || "";
+      const yearFilter = document.getElementById("programYearFilter")?.value || "";
 
       return cachedPrograms.filter(program => {
         const matchesField = !fieldFilter || program.field === fieldFilter;
+        const matchesYear = !yearFilter || program.plan_year === yearFilter;
 
         const haystack = [
           program.program_name,
           program.indicator_name,
           program.owner_role,
           program.field,
-          program.status
+          program.status,
+          program.plan_year
         ].join(" ").toLowerCase();
 
         const matchesSearch = !search || haystack.includes(search);
-        return matchesField && matchesSearch;
+        return matchesField && matchesSearch && matchesYear;
       });
     }
 
@@ -1169,7 +1191,7 @@
           currentField = program.field;
           const fieldTitle = document.createElement("h3");
           fieldTitle.className = "field-title";
-          fieldTitle.textContent = currentField || "بدون مجال";
+          fieldTitle.textContent = `${currentField} - ${program.plan_year || ""}`;
           container.appendChild(fieldTitle);
         }
 
@@ -1180,6 +1202,7 @@
           <h3>${escapeHtml(program.program_name || "")}</h3>
 
           <div class="program-meta">
+            <div><strong>العام الخطي:</strong> ${escapeHtml(program.plan_year || "1447هـ")}</div>
             <div><strong>المجال:</strong> ${escapeHtml(program.field || "")}</div>
             <div><strong>المؤشر:</strong> ${escapeHtml(program.indicator_name || "غير محدد")}</div>
             <div><strong>المسؤول:</strong> ${escapeHtml(program.owner_role || "مشترك")}</div>
@@ -1224,6 +1247,8 @@
       const { data, error } = await supabaseClient
         .from("programs")
         .select("*")
+        .eq("archived", false)
+        .order("plan_year", { ascending: true })
         .order("field", { ascending: true });
 
       if (error) {
@@ -1442,6 +1467,7 @@
       if (!program) return;
 
       document.getElementById("editingProgramId").value = program.id;
+      document.getElementById("plan_year").value = program.plan_year || "1447هـ";
       document.getElementById("field").value = program.field || "";
       document.getElementById("indicator_name").value = program.indicator_name || "";
       document.getElementById("program_name").value = program.program_name || "";
@@ -1456,6 +1482,7 @@
     function resetProgramForm() {
       document.getElementById("editingProgramId").value = "";
       document.getElementById("programForm").reset();
+      document.getElementById("plan_year").value = "1447هـ";
       document.getElementById("owner_role").value = "مشترك";
       document.getElementById("progress").value = 0;
       document.getElementById("programFormTitle").textContent = "إضافة برنامج في الخطة التشغيلية";
@@ -1478,6 +1505,62 @@
       }
 
       showMessage("globalMessage", "success", "تم حذف البرنامج بنجاح");
+      await refreshAll();
+    }
+
+    async function renewPlanToNewYear() {
+      clearMessage("globalMessage");
+
+      const sourceYear = document.getElementById("sourcePlanYear").value.trim();
+      const targetYear = document.getElementById("targetPlanYear").value.trim();
+
+      if (!sourceYear || !targetYear) {
+        showMessage("globalMessage", "error", "يرجى تحديد العام الحالي والعام الجديد");
+        return;
+      }
+
+      if (sourceYear === targetYear) {
+        showMessage("globalMessage", "error", "لا يمكن أن يكون العام الجديد مطابقًا للعام الحالي");
+        return;
+      }
+
+      const sourcePrograms = cachedPrograms.filter(p => p.plan_year === sourceYear);
+
+      if (!sourcePrograms.length) {
+        showMessage("globalMessage", "error", "لا توجد برامج في العام المحدد للنسخ");
+        return;
+      }
+
+      const targetExisting = cachedPrograms.filter(p => p.plan_year === targetYear);
+      if (targetExisting.length) {
+        showMessage("globalMessage", "error", "يوجد بالفعل برامج في العام الجديد، لا يمكن النسخ مرة أخرى");
+        return;
+      }
+
+      const newPrograms = sourcePrograms.map(program => ({
+        field: program.field,
+        indicator_name: program.indicator_name,
+        program_name: program.program_name,
+        owner_role: program.owner_role || "مشترك",
+        start_date: null,
+        progress: 0,
+        status: "قيد التنفيذ",
+        plan_year: targetYear,
+        archived: false
+      }));
+
+      const { error } = await supabaseClient
+        .from("programs")
+        .insert(newPrograms);
+
+      if (error) {
+        console.log(error);
+        showMessage("globalMessage", "error", "حدث خطأ أثناء تجديد الخطة");
+        return;
+      }
+
+      document.getElementById("programYearFilter").value = targetYear;
+      showMessage("globalMessage", "success", `تم تجديد الخطة بنجاح من ${sourceYear} إلى ${targetYear}`);
       await refreshAll();
     }
 
@@ -1600,6 +1683,7 @@
       await loadPrograms();
       await loadSwot();
       await applyLoggedInRole();
+      await updateAuthButton();
       renderPrograms();
       renderSwot();
     }
@@ -1611,13 +1695,15 @@
       const editingId = document.getElementById("editingProgramId").value;
 
       const payload = {
+        plan_year: document.getElementById("plan_year").value || "1447هـ",
         field: document.getElementById("field").value,
         indicator_name: document.getElementById("indicator_name").value,
         program_name: document.getElementById("program_name").value,
         owner_role: document.getElementById("owner_role").value || "مشترك",
         start_date: document.getElementById("start_date").value || null,
         progress: Number(document.getElementById("progress").value || 0),
-        status: document.getElementById("status").value
+        status: document.getElementById("status").value,
+        archived: false
       };
 
       if (editingId) {
@@ -1773,43 +1859,9 @@
       await loadUsers();
     });
 
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      clearMessage("globalMessage");
-
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
-      const loginStatus = document.getElementById("loginStatus");
-
-      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        console.log(error);
-        loginStatus.textContent = "فشل تسجيل الدخول";
-        showMessage("globalMessage", "error", "فشل تسجيل الدخول، تأكدي من البريد وكلمة المرور");
-        return;
-      }
-
-      document.getElementById("loginForm").reset();
-      await applyLoggedInRole();
-      await refreshAll();
-      showMessage("globalMessage", "success", "تم تسجيل الدخول بنجاح");
-    });
-
-    document.getElementById("logoutBtn").addEventListener("click", async () => {
-      clearMessage("globalMessage");
-      await supabaseClient.auth.signOut();
-      currentUserRole = null;
-      currentUserEmail = null;
-      document.getElementById("logoutBtn").style.display = "none";
-      document.getElementById("loginStatus").textContent = "تم تسجيل الخروج";
-      applyRoleView();
-      showMessage("globalMessage", "success", "تم تسجيل الخروج");
-      await refreshAll();
-    });
-
     document.getElementById("programSearchInput").addEventListener("input", renderPrograms);
     document.getElementById("programFieldFilter").addEventListener("change", renderPrograms);
+    document.getElementById("programYearFilter").addEventListener("change", renderPrograms);
 
     window.onclick = function(event) {
       const modal = document.getElementById("evidenceModal");
