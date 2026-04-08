@@ -163,10 +163,29 @@
       e.preventDefault();
 
       const fullName = document.getElementById("fullName").value.trim();
-      const email = document.getElementById("email").value.trim();
+      const email = document.getElementById("email").value.trim().toLowerCase();
       const password = document.getElementById("password").value;
       const role = document.getElementById("role").value;
 
+      // 1) التحقق هل البريد موجود مسبقًا في جدول users
+      const { data: existingUser, error: existingUserError } = await supabaseClient
+        .from("users")
+        .select("id, email, role, status")
+        .eq("email", email)
+        .maybeSingle();
+
+      if (existingUserError) {
+        console.log(existingUserError);
+        showMessage("error", "تعذر التحقق من البريد الإلكتروني");
+        return;
+      }
+
+      if (existingUser) {
+        showMessage("error", "هذا البريد مستخدم مسبقًا، استخدمي بريدًا آخر أو سجلي الدخول");
+        return;
+      }
+
+      // 2) إنشاء الحساب في Authentication
       const { error: authError } = await supabaseClient.auth.signUp({
         email,
         password
@@ -178,14 +197,15 @@
         return;
       }
 
+      // 3) إضافة المستخدم في جدول users بدون upsert
       const { error: insertError } = await supabaseClient
         .from("users")
-        .upsert([{
+        .insert([{
           name: fullName,
           email,
           role,
           status: "pending"
-        }], { onConflict: "email" });
+        }]);
 
       if (insertError) {
         console.log(insertError);
