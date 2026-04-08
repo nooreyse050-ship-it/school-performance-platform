@@ -50,7 +50,7 @@
 
     .top-bar {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
       gap: 12px;
       margin-bottom: 14px;
@@ -59,7 +59,8 @@
 
     .profile-wrapper {
       position: relative;
-      margin-inline-start: auto;
+      margin-inline-end: auto;
+      margin-inline-start: 0;
     }
 
     .profile-trigger {
@@ -110,7 +111,7 @@
     .profile-menu {
       position: absolute;
       top: calc(100% + 10px);
-      left: 0;
+      right: 0;
       min-width: 260px;
       background: #fff;
       border: 1px solid var(--green-border);
@@ -507,7 +508,7 @@
 
     .toolbar {
       display: grid;
-      grid-template-columns: 1fr 220px 160px;
+      grid-template-columns: 1fr 220px 180px;
       gap: 12px;
       margin-bottom: 18px;
     }
@@ -587,14 +588,15 @@
         align-items: stretch;
       }
       .top-bar {
-        justify-content: center;
+        justify-content: flex-start;
       }
       .profile-wrapper {
+        margin-inline-end: auto;
         margin-inline-start: 0;
       }
       .profile-menu {
-        left: 50%;
-        transform: translateX(-50%);
+        right: 0;
+        left: auto;
         width: 280px;
       }
     }
@@ -661,11 +663,8 @@
       </div>
     </section>
 
-    <section class="section" id="authSection">
-      <h2>الدخول إلى المنصة</h2>
-      <div id="globalMessage" class="message-box"></div>
-      <div id="loginStatus" class="muted"></div>
-    </section>
+    <div id="globalMessage" class="message-box"></div>
+    <div id="loginStatus" class="muted"></div>
 
     <section class="section section-anchor" id="leadershipSection">
       <h2>لوحة القيادة</h2>
@@ -704,27 +703,6 @@
       </div>
     </section>
 
-    <section class="section">
-      <h2>تسجيل مستخدم جديد</h2>
-      <form id="registerForm">
-        <label>الاسم الكامل</label>
-        <input id="register_name" type="text" placeholder="اكتبي الاسم الكامل" required />
-
-        <label>البريد الإلكتروني</label>
-        <input id="register_email" type="email" placeholder="example@email.com" required />
-
-        <label>الدور</label>
-        <select id="register_role" required>
-          <option value="معلمة">معلمة</option>
-          <option value="مساعد إداري">مساعد إداري</option>
-          <option value="وكيلة">وكيلة</option>
-          <option value="موجهة طلابية">موجهة طلابية</option>
-        </select>
-
-        <button class="btn-primary" type="submit">إرسال طلب التسجيل</button>
-      </form>
-    </section>
-
     <section class="section" id="adminUsersSection" style="display:none;">
       <h2>طلبات التسجيل</h2>
       <div id="usersList" class="program-cards"></div>
@@ -744,10 +722,10 @@
       <h2>تجديد الخطة للعام القادم</h2>
 
       <label>نسخ من عام</label>
-      <input id="sourcePlanYear" type="text" value="1447هـ" />
+      <select id="sourcePlanYear"></select>
 
       <label>إلى عام جديد</label>
-      <input id="targetPlanYear" type="text" value="1448هـ" />
+      <select id="targetPlanYear"></select>
 
       <div class="inline-actions">
         <button class="btn-primary" type="button" onclick="renewPlanToNewYear()">تجديد الخطة</button>
@@ -760,7 +738,7 @@
         <input type="hidden" id="editingProgramId" />
 
         <label>العام الخطي</label>
-        <input id="plan_year" type="text" value="1447هـ" />
+        <select id="plan_year"></select>
 
         <label>المجال</label>
         <select id="field" required>
@@ -813,12 +791,7 @@
           <option value="البيئة المدرسية">البيئة المدرسية</option>
           <option value="الشراكة المجتمعية">الشراكة المجتمعية</option>
         </select>
-        <select id="programYearFilter">
-          <option value="">كل الأعوام</option>
-          <option value="1447هـ">1447هـ</option>
-          <option value="1448هـ">1448هـ</option>
-          <option value="1449هـ">1449هـ</option>
-        </select>
+        <select id="programYearFilter"></select>
       </div>
 
       <div id="programs" class="program-cards"></div>
@@ -990,6 +963,28 @@
       box.className = "message-box";
       box.textContent = "";
       box.style.display = "none";
+    }
+
+    function fillYearDropdown(selectId, includeEmpty = false, selectedValue = "") {
+      const select = document.getElementById(selectId);
+      if (!select) return;
+
+      select.innerHTML = "";
+
+      if (includeEmpty) {
+        const emptyOption = document.createElement("option");
+        emptyOption.value = "";
+        emptyOption.textContent = "كل الأعوام";
+        select.appendChild(emptyOption);
+      }
+
+      for (let year = 1430; year <= 1500; year++) {
+        const option = document.createElement("option");
+        option.value = `${year}هـ`;
+        option.textContent = `${year}هـ`;
+        if (`${year}هـ` === selectedValue) option.selected = true;
+        select.appendChild(option);
+      }
     }
 
     function goToLogin() {
@@ -1673,7 +1668,7 @@
     function resetProgramForm() {
       document.getElementById("editingProgramId").value = "";
       document.getElementById("programForm").reset();
-      document.getElementById("plan_year").value = "1447هـ";
+      fillYearDropdown("plan_year", false, "1447هـ");
       document.getElementById("owner_role").value = "مشترك";
       document.getElementById("progress").value = 0;
       document.getElementById("programFormTitle").textContent = "إضافة برنامج في الخطة التشغيلية";
@@ -1950,6 +1945,23 @@
       await loadSwot();
     });
 
+    document.getElementById("profileTrigger").addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleProfileMenu();
+    });
+
+    document.addEventListener("click", (e) => {
+      const menu = document.getElementById("profileMenu");
+      const trigger = document.getElementById("profileTrigger");
+      if (!menu.contains(e.target) && !trigger.contains(e.target)) {
+        closeProfileMenu();
+      }
+    });
+
+    document.getElementById("programSearchInput").addEventListener("input", renderPrograms);
+    document.getElementById("programFieldFilter").addEventListener("change", renderPrograms);
+    document.getElementById("programYearFilter").addEventListener("change", renderPrograms);
+
     document.getElementById("evidenceForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       clearMessage("evidenceMessage");
@@ -2025,51 +2037,15 @@
       showMessage("evidenceMessage", "success", "تم حفظ الشاهد بنجاح");
     });
 
-    document.getElementById("registerForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      clearMessage("globalMessage");
-
-      const payload = {
-        name: document.getElementById("register_name").value,
-        email: document.getElementById("register_email").value,
-        role: document.getElementById("register_role").value,
-        status: "pending"
-      };
-
-      const { error } = await supabaseClient.from("users").insert([payload]);
-
-      if (error) {
-        console.log(error);
-        showMessage("globalMessage", "error", "حدث خطأ أثناء إرسال طلب التسجيل");
-        return;
-      }
-
-      document.getElementById("registerForm").reset();
-      showMessage("globalMessage", "success", "تم إرسال طلب التسجيل بنجاح، وبانتظار اعتماد الإدارة");
-      await loadUsers();
-    });
-
-    document.getElementById("programSearchInput").addEventListener("input", renderPrograms);
-    document.getElementById("programFieldFilter").addEventListener("change", renderPrograms);
-    document.getElementById("programYearFilter").addEventListener("change", renderPrograms);
-
-    document.getElementById("profileTrigger").addEventListener("click", (e) => {
-      e.stopPropagation();
-      toggleProfileMenu();
-    });
-
-    document.addEventListener("click", (e) => {
-      const menu = document.getElementById("profileMenu");
-      const trigger = document.getElementById("profileTrigger");
-      if (!menu.contains(e.target) && !trigger.contains(e.target)) {
-        closeProfileMenu();
-      }
-    });
-
     window.onclick = function(event) {
       const modal = document.getElementById("evidenceModal");
       if (event.target === modal) closeEvidenceModal();
     };
+
+    fillYearDropdown("plan_year", false, "1447هـ");
+    fillYearDropdown("programYearFilter", true, "");
+    fillYearDropdown("sourcePlanYear", false, "1447هـ");
+    fillYearDropdown("targetPlanYear", false, "1448هـ");
 
     refreshAll();
   </script>
