@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>تسجيل الدخول</title>
+  <title>Login</title>
   <style>
     body {
       margin: 0;
@@ -17,7 +17,7 @@
       box-sizing: border-box;
     }
 
-    .login-card {
+    .card {
       width: 100%;
       max-width: 460px;
       background: #fff;
@@ -91,11 +91,24 @@
       margin-top: 12px;
       line-height: 1.8;
     }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .actions a {
+      color: #14532d;
+      text-decoration: none;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <div class="login-card">
-    <h1>تسجيل الدخول</h1>
+  <div class="card">
+    <h1>Login</h1>
 
     <div id="loginMessage" class="message-box"></div>
 
@@ -109,7 +122,12 @@
       <button class="btn-primary" type="submit">دخول</button>
     </form>
 
-    <div class="muted">بعد تسجيل الدخول سيتم إعادتك تلقائيًا إلى الصفحة الرئيسية</div>
+    <div class="actions">
+      <a href="signup.html">Sign up</a>
+      <a href="index.html">العودة للرئيسية</a>
+    </div>
+
+    <div class="muted">بعد تسجيل الدخول سيتم إعادتك تلقائيًا إلى الصفحة السابقة</div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -134,10 +152,7 @@
       const email = document.getElementById("loginEmail").value;
       const password = document.getElementById("loginPassword").value;
 
-      const { error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password
-      });
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
       if (error) {
         console.log(error);
