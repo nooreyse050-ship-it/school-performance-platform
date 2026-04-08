@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign up</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #e8f3ea;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: #fff;
+      border-radius: 22px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      padding: 24px;
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #14532d;
+      font-size: 28px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 14px;
+      font-size: 15px;
+      margin-bottom: 14px;
+      box-sizing: border-box;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .btn-primary {
+      background: #166534;
+      color: #fff;
+      width: 100%;
+    }
+
+    .message-box {
+      display: none;
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      line-height: 1.8;
+      font-size: 14px;
+      border: 1px solid transparent;
+    }
+
+    .message-box.error {
+      display: block;
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .message-box.success {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+
+    .muted {
+      color: #6b7280;
+      margin-top: 12px;
+      line-height: 1.8;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .actions a {
+      color: #14532d;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Sign up</h1>
+
+    <div id="signupMessage" class="message-box"></div>
+
+    <form id="signupForm">
+      <label>الاسم الكامل</label>
+      <input id="fullName" type="text" required />
+
+      <label>البريد الإلكتروني</label>
+      <input id="email" type="email" required />
+
+      <label>كلمة المرور</label>
+      <input id="password" type="password" required />
+
+      <label>الدور</label>
+      <select id="role" required>
+        <option value="معلمة">معلمة</option>
+        <option value="مساعد إداري">مساعد إداري</option>
+        <option value="وكيلة">وكيلة</option>
+        <option value="موجهة طلابية">موجهة طلابية</option>
+      </select>
+
+      <button class="btn-primary" type="submit">إنشاء الحساب</button>
+    </form>
+
+    <div class="actions">
+      <a href="login.html">Login</a>
+      <a href="index.html">العودة للرئيسية</a>
+    </div>
+
+    <div class="muted">
+      بعد إنشاء الحساب سيتم تسجيله بحالة انتظار، وتحتاج الإدارة إلى تفعيله قبل استخدام جميع الصلاحيات
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = "https://uekovggqcsnbwpnbibjz.supabase.co";
+    const supabaseKey = "sb_publishable_i0vQ90zclZwHaSFCzHOOfw_Gsfkld9f";
+    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    function showMessage(type, message) {
+      const box = document.getElementById("signupMessage");
+      box.className = `message-box ${type}`;
+      box.textContent = message;
+      box.style.display = "block";
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const returnTo = params.get("return") || "index.html";
+
+    document.getElementById("signupForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const fullName = document.getElementById("fullName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const role = document.getElementById("role").value;
+
+      const { error: authError } = await supabaseClient.auth.signUp({
+        email,
+        password
+      });
+
+      if (authError) {
+        console.log(authError);
+        showMessage("error", authError.message || "تعذر إنشاء الحساب");
+        return;
+      }
+
+      const { error: insertError } = await supabaseClient
+        .from("users")
+        .upsert([{
+          name: fullName,
+          email,
+          role,
+          status: "pending"
+        }], { onConflict: "email" });
+
+      if (insertError) {
+        console.log(insertError);
+        showMessage("error", insertError.message || "تم إنشاء الحساب لكن تعذر حفظ بيانات المستخدم");
+        return;
+      }
+
+      showMessage("success", "تم إنشاء الحساب بنجاح، وبانتظار اعتماد الإدارة");
+      setTimeout(() => {
+        window.location.href = returnTo;
+      }, 1200);
+    });
+  </script>
+</body>
+</html>
