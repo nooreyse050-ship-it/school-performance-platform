@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login</title>
+  <title>تسجيل الدخول - منصة قيادة الأداء المدرسي</title>
   <style>
     body {
       margin: 0;
@@ -19,17 +19,29 @@
 
     .card {
       width: 100%;
-      max-width: 460px;
+      max-width: 480px;
       background: #fff;
       border-radius: 22px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.08);
       padding: 24px;
     }
 
-    h1 {
-      margin-top: 0;
+    .site-title {
+      text-align: center;
       color: #14532d;
+      line-height: 1.8;
+      margin-bottom: 18px;
+    }
+
+    .site-title h1 {
+      margin: 0;
       font-size: 28px;
+    }
+
+    .site-title p {
+      margin: 6px 0 0;
+      color: #6b7280;
+      font-size: 14px;
     }
 
     label {
@@ -86,12 +98,6 @@
       border-color: #bbf7d0;
     }
 
-    .muted {
-      color: #6b7280;
-      margin-top: 12px;
-      line-height: 1.8;
-    }
-
     .actions {
       display: flex;
       gap: 10px;
@@ -104,11 +110,21 @@
       text-decoration: none;
       font-weight: bold;
     }
+
+    .muted {
+      color: #6b7280;
+      margin-top: 12px;
+      line-height: 1.8;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>تسجيل الدخول</h1>
+    <div class="site-title">
+      <h1>منصة قيادة الأداء المدرسي</h1>
+      <p>النخيل الابتدائية بالقطيف – طفولة مبكرة والروضة الملحقة بها</p>
+    </div>
 
     <div id="loginMessage" class="message-box"></div>
 
@@ -119,15 +135,16 @@
       <label>كلمة المرور</label>
       <input id="loginPassword" type="password" required />
 
-      <button class="btn-primary" type="submit">دخول</button>
+      <button class="btn-primary" type="submit">تسجيل الدخول</button>
     </form>
 
     <div class="actions">
-      <a href="signup.html">Sign up</a>
-      <a href="index.html">العودة للرئيسية</a>
+      <a href="signup.html">إنشاء حساب جديد</a>
     </div>
 
-    <div class="muted">بعد تسجيل الدخول سيتم إعادتك تلقائيًا إلى الصفحة الرئيسية</div>
+    <div class="muted">
+      يلزم تسجيل الدخول بحساب معتمد من إدارة المدرسة للوصول إلى خصائص المنصة.
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -149,7 +166,7 @@
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const email = document.getElementById("loginEmail").value.trim();
+      const email = document.getElementById("loginEmail").value.trim().toLowerCase();
       const password = document.getElementById("loginPassword").value;
 
       const { error } = await supabaseClient.auth.signInWithPassword({
@@ -160,6 +177,24 @@
       if (error) {
         console.log(error);
         showMessage("error", "فشل تسجيل الدخول، تأكدي من البريد وكلمة المرور");
+        return;
+      }
+
+      const { data: userRow, error: userError } = await supabaseClient
+        .from("users")
+        .select("status")
+        .eq("email", email)
+        .maybeSingle();
+
+      if (userError || !userRow) {
+        await supabaseClient.auth.signOut();
+        showMessage("error", "تم تسجيل الدخول، لكن لا يوجد سجل مستخدم مرتبط بهذا البريد");
+        return;
+      }
+
+      if (userRow.status !== "active") {
+        await supabaseClient.auth.signOut();
+        showMessage("error", "حسابك بانتظار موافقة المديرة قبل الدخول للمنصة");
         return;
       }
 
