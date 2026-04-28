@@ -634,7 +634,14 @@
               <div><strong>البريد:</strong> <span id="menuUserEmail">-</span></div>
             </div>
             <div class="inline-actions">
+              <button class="btn-secondary btn-small" type="button" onclick="showEditProfileForm()">تعديل الاسم</button>
               <button class="btn-danger btn-small" type="button" onclick="handleLogout()">تسجيل الخروج</button>
+            </div>
+
+            <div id="editProfileBox" style="display:none; margin-top:12px;">
+              <label>تعديل الاسم</label>
+              <input id="editProfileName" type="text" placeholder="اكتبي الاسم الجديد" />
+              <button class="btn-primary btn-small" type="button" onclick="saveProfileName()">حفظ الاسم</button>
             </div>
           </div>
         </div>
@@ -1038,7 +1045,51 @@
     }
 
     function canDeleteEvidence() {
-      return ["مديرة المدرسة", "وكيلة"].includes(currentUserRole);
+      return currentUserRole === "مديرة المدرسة";
+    }
+
+    function canUploadEvidence() {
+      return Boolean(currentUserEmail && currentUserRole);
+    }
+
+    function showEditProfileForm() {
+      const box = document.getElementById("editProfileBox");
+      const input = document.getElementById("editProfileName");
+      if (!box || !input) return;
+      input.value = currentUserName || "";
+      box.style.display = box.style.display === "none" ? "block" : "none";
+    }
+
+    async function saveProfileName() {
+      clearMessage("globalMessage");
+
+      if (!currentUserEmail) {
+        showMessage("globalMessage", "error", "يجب تسجيل الدخول أولًا");
+        return;
+      }
+
+      const input = document.getElementById("editProfileName");
+      const newName = input ? input.value.trim() : "";
+
+      if (!newName) {
+        showMessage("globalMessage", "error", "يرجى كتابة الاسم");
+        return;
+      }
+
+      const { error } = await supabaseClient
+        .from("users")
+        .update({ name: newName })
+        .eq("email", currentUserEmail);
+
+      if (error) {
+        console.log(error);
+        showMessage("globalMessage", "error", "تعذر تحديث الاسم");
+        return;
+      }
+
+      currentUserName = newName;
+      renderProfileCard();
+      showMessage("globalMessage", "success", "تم تحديث الاسم بنجاح");
     }
 
     function toggleProfileMenu() {
@@ -1087,9 +1138,7 @@
       currentUserEmail = null;
       currentUserName = null;
       renderProfileCard();
-      showMessage("globalMessage", "success", "تم تسجيل الخروج");
-      await applyLoggedInRole();
-      await refreshAll();
+      window.location.href = "login.html?return=index.html";
     }
 
     function applyRoleView() {
@@ -1147,6 +1196,7 @@
         loginStatus.textContent = "لم يتم تسجيل الدخول بعد";
         applyRoleView();
         renderProfileCard();
+        window.location.href = "login.html?return=index.html";
         return;
       }
 
@@ -1159,6 +1209,8 @@
         loginStatus.textContent = "تم تسجيل الدخول، لكن لا يوجد سجل مستخدم مرتبط بهذا البريد";
         applyRoleView();
         renderProfileCard();
+        await supabaseClient.auth.signOut();
+        window.location.href = "login.html?return=index.html";
         return;
       }
 
@@ -1166,9 +1218,11 @@
 
       if (roleData.status === "pending") {
         currentUserRole = null;
-        loginStatus.textContent = "الحساب بانتظار موافقة الإدارة";
+        loginStatus.textContent = "الحساب بانتظار موافقة المديرة";
         applyRoleView();
         renderProfileCard();
+        await supabaseClient.auth.signOut();
+        window.location.href = "login.html?return=index.html";
         return;
       }
 
@@ -1177,6 +1231,8 @@
         loginStatus.textContent = "هذا الحساب موقوف";
         applyRoleView();
         renderProfileCard();
+        await supabaseClient.auth.signOut();
+        window.location.href = "login.html?return=index.html";
         return;
       }
 
@@ -1403,10 +1459,14 @@
             </div>
 
             <div class="inline-actions">
-              <button class="upload-evidence-btn btn-small" type="button"
-                onclick='openEvidenceModal(${JSON.stringify(program.id)}, ${JSON.stringify(program.program_name || "")})'>
-                رفع شاهد
-              </button>
+              ${
+                canUploadEvidence()
+                  ? `<button class="upload-evidence-btn btn-small" type="button"
+                      onclick='openEvidenceModal(${JSON.stringify(program.id)}, ${JSON.stringify(program.program_name || "")})'>
+                      رفع شاهد
+                    </button>`
+                  : `<span class="badge">يلزم تسجيل الدخول واعتماد الحساب لرفع الشواهد</span>`
+              }
 
               ${
                 canEditPrograms()
@@ -1788,10 +1848,21 @@
     }
 
     function openEvidenceModal(programId, programName) {
+      if (!canUploadEvidence()) {
+        showMessage("globalMessage", "error", "لا يمكن رفع الشواهد إلا بعد تسجيل الدخول واعتماد الحساب من المديرة");
+        return;
+      }
+
       document.getElementById("evidenceProgramId").value = programId;
       document.getElementById("evidenceModalTitle").textContent = "رفع شاهد - " + (programName || "");
       document.getElementById("evidenceModal").style.display = "block";
       document.getElementById("evidenceForm").reset();
+
+      const uploaderNameInput = document.getElementById("uploaderName");
+      const uploaderRoleInput = document.getElementById("uploaderRole");
+      if (uploaderNameInput) uploaderNameInput.value = currentUserName || "";
+      if (uploaderRoleInput && currentUserRole) uploaderRoleInput.value = currentUserRole;
+
       clearMessage("evidenceMessage");
       loadEvidenceForProgram(programId);
     }
@@ -1966,6 +2037,11 @@
       e.preventDefault();
       clearMessage("evidenceMessage");
 
+      if (!canUploadEvidence()) {
+        showMessage("evidenceMessage", "error", "لا يمكن حفظ الشاهد إلا بعد تسجيل الدخول واعتماد الحساب من المديرة");
+        return;
+      }
+
       const programId = document.getElementById("evidenceProgramId").value;
       const uploaderName = document.getElementById("uploaderName").value.trim();
       const uploaderRole = document.getElementById("uploaderRole").value;
@@ -2042,12 +2118,23 @@
       if (event.target === modal) closeEvidenceModal();
     };
 
-    fillYearDropdown("plan_year", false, "1447هـ");
-    fillYearDropdown("programYearFilter", true, "");
-    fillYearDropdown("sourcePlanYear", false, "1447هـ");
-    fillYearDropdown("targetPlanYear", false, "1448هـ");
+    async function initPage() {
+      const { data } = await supabaseClient.auth.getUser();
 
-    refreshAll();
+      if (!data?.user) {
+        window.location.href = "login.html?return=index.html";
+        return;
+      }
+
+      fillYearDropdown("plan_year", false, "1447هـ");
+      fillYearDropdown("programYearFilter", true, "");
+      fillYearDropdown("sourcePlanYear", false, "1447هـ");
+      fillYearDropdown("targetPlanYear", false, "1448هـ");
+
+      await refreshAll();
+    }
+
+    initPage();
   </script>
 </body>
 </html>
