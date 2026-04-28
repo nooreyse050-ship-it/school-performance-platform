@@ -16,7 +16,6 @@
       padding: 16px;
       box-sizing: border-box;
     }
-
     .card {
       width: 100%;
       max-width: 480px;
@@ -25,31 +24,26 @@
       box-shadow: 0 4px 14px rgba(0,0,0,0.08);
       padding: 24px;
     }
-
     .site-title {
       text-align: center;
       color: #14532d;
       line-height: 1.8;
       margin-bottom: 18px;
     }
-
     .site-title h1 {
       margin: 0;
       font-size: 28px;
     }
-
     .site-title p {
       margin: 6px 0 0;
       color: #6b7280;
       font-size: 14px;
     }
-
     label {
       display: block;
       margin-bottom: 8px;
       font-weight: bold;
     }
-
     input {
       width: 100%;
       padding: 14px;
@@ -59,7 +53,6 @@
       margin-bottom: 14px;
       box-sizing: border-box;
     }
-
     button {
       border: none;
       border-radius: 14px;
@@ -67,13 +60,17 @@
       cursor: pointer;
       font-size: 15px;
     }
-
     .btn-primary {
       background: #166534;
       color: #fff;
       width: 100%;
     }
-
+    .btn-secondary {
+      background: #dbe7dd;
+      color: #14532d;
+      width: 100%;
+      margin-top: 10px;
+    }
     .message-box {
       display: none;
       padding: 12px 14px;
@@ -83,34 +80,29 @@
       font-size: 14px;
       border: 1px solid transparent;
     }
-
     .message-box.error {
       display: block;
       background: #fee2e2;
       color: #991b1b;
       border-color: #fecaca;
     }
-
     .message-box.success {
       display: block;
       background: #dcfce7;
       color: #166534;
       border-color: #bbf7d0;
     }
-
     .actions {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
       margin-top: 12px;
     }
-
     .actions a {
       color: #14532d;
       text-decoration: none;
       font-weight: bold;
     }
-
     .muted {
       color: #6b7280;
       margin-top: 12px;
@@ -137,6 +129,10 @@
 
       <button class="btn-primary" type="submit">تسجيل الدخول</button>
     </form>
+
+    <button class="btn-secondary" type="button" onclick="sendResetPassword()">
+      نسيت كلمة المرور؟
+    </button>
 
     <div class="actions">
       <a href="signup.html">إنشاء حساب جديد</a>
@@ -175,7 +171,6 @@
       });
 
       if (error) {
-        console.log(error);
         showMessage("error", "فشل تسجيل الدخول، تأكدي من البريد وكلمة المرور");
         return;
       }
@@ -203,6 +198,28 @@
         window.location.href = returnTo;
       }, 700);
     });
+
+    async function sendResetPassword() {
+      const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+
+      if (!email) {
+        showMessage("error", "اكتبي البريد الإلكتروني أولًا ثم اضغطي نسيت كلمة المرور");
+        return;
+      }
+
+      const redirectTo = window.location.origin + "/reset-password.html";
+
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo
+      });
+
+      if (error) {
+        showMessage("error", error.message || "تعذر إرسال رابط إعادة تعيين كلمة المرور");
+        return;
+      }
+
+      showMessage("success", "تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني");
+    }
   </script>
 </body>
 </html>
