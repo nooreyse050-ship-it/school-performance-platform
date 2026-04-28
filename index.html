@@ -744,7 +744,7 @@
       <form id="programForm">
         <input type="hidden" id="editingProgramId" />
 
-        <label>العام الخطي</label>
+        <label>خطة عام</label>
         <select id="plan_year"></select>
 
         <label>المجال</label>
@@ -1444,7 +1444,7 @@
           <h3>${escapeHtml(program.program_name || "")}</h3>
 
           <div class="program-meta">
-            <div><strong>العام الخطي:</strong> ${escapeHtml(program.plan_year || "1447هـ")}</div>
+            <div><strong>خطة عام:</strong> ${escapeHtml(program.plan_year || "1447هـ")}</div>
             <div><strong>المجال:</strong> ${escapeHtml(program.field || "")}</div>
             <div><strong>المؤشر:</strong> ${escapeHtml(program.indicator_name || "غير محدد")}</div>
             <div><strong>المسؤول:</strong> ${escapeHtml(program.owner_role || "مشترك")}</div>
@@ -1678,6 +1678,7 @@
 
                 <div class="inline-actions">
                   <button class="btn-primary btn-small" type="button" onclick='updateUserStatus("${user.id}", "active")'>إعادة تفعيل</button>
+                  <button class="btn-danger btn-small" type="button" onclick='deleteUser("${user.id}")'>حذف نهائي</button>
                 </div>
               </div>
             `;
@@ -1706,6 +1707,32 @@
       showMessage("globalMessage", "success", "تم تحديث حالة المستخدم بنجاح");
       await loadUsers();
       await applyLoggedInRole();
+    }
+
+    async function deleteUser(userId) {
+      clearMessage("globalMessage");
+
+      if (!canManageUsers()) {
+        showMessage("globalMessage", "error", "الحذف متاح للمديرة فقط");
+        return;
+      }
+
+      const confirmed = confirm("هل أنت متأكدة من حذف المستخدم نهائياً من قائمة النظام؟");
+      if (!confirmed) return;
+
+      const { error } = await supabaseClient
+        .from("users")
+        .delete()
+        .eq("id", userId);
+
+      if (error) {
+        console.log(error);
+        showMessage("globalMessage", "error", "حدث خطأ أثناء حذف المستخدم");
+        return;
+      }
+
+      showMessage("globalMessage", "success", "تم حذف المستخدم نهائياً من النظام");
+      await loadUsers();
     }
 
     function startEditProgram(programId) {
