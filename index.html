@@ -1586,7 +1586,7 @@
 
       cachedUsers = data || [];
       const pendingUsers = cachedUsers.filter(user => user.status === "pending");
-      const activeUsers = cachedUsers.filter(user => user.status === "active");
+      const activeUsers = cachedUsers.filter(user => user.status === "active" && user.role !== "مديرة المدرسة");
       const blockedUsers = cachedUsers.filter(user => user.status === "blocked");
 
       if (pendingContainer) {
@@ -1714,6 +1714,12 @@
 
       if (!canManageUsers()) {
         showMessage("globalMessage", "error", "الحذف متاح للمديرة فقط");
+        return;
+      }
+
+      const user = cachedUsers.find(u => String(u.id) === String(userId));
+      if (user?.role === "مديرة المدرسة") {
+        showMessage("globalMessage", "error", "لا يمكن حذف حساب المديرة");
         return;
       }
 
